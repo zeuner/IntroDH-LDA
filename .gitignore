@@ -1,0 +1,7 @@
+*~
+.Rhistory
+.RData
+pdfs/*
+txts/*
+csvs/*
+results/*
