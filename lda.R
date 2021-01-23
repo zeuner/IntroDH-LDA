@@ -46,14 +46,9 @@ download_file <- function(URL,outfile,nth,total) {
     if (file.exists(outfile)){
         outfile <- str_replace(outfile, ".pdf$", "_1.pdf")
         }
-    return_value <- system(sprintf("curl -s -o '%s' '%s'", 
-                                       outfile,URL))
-    if (return_value != 0) {
-            return(sprintf("[%3d/%3d] Error downloading %s from %s",
-                           nth,total,outfile,URL))}
-        else {
-            return(sprintf("[%3d/%3d] Download of file %s successful",
-                           nth,total,outfile ))}}
+    download.file(URL, outfile, mode = "wb")
+    return(sprintf("[%3d/%3d] Downloaded file %s",
+                           nth,total,outfile ))}
 
 
 download_pdfs <- function(nth, links) {
