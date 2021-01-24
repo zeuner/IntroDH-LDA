@@ -79,12 +79,33 @@ writeLines(unlist(download_results),"./results/download_results.txt")
 if (! dir.exists("./txts")){
     dir.create("./txts")}
 
+newline <- function (x,y) {
+    if (!y) {
+        paste(x,"\n",sep="")}
+    else x}
+
+insert_newlines <- function (t) {
+    words <- t$text
+    spaces <- t$space
+    mapply(newline, words, spaces)}
 
 pdf_to_txt <- function(infile,outfile,nth,total) {
     if (! file.exists(outfile)){
-        pdf_text(infile) %>% readr::read_lines() %>% writeLines(outfile)
+        pdf_data(infile) %>%
+            ## Apparently all needed pages' content starts on y coordinate 67
+            lapply(function (x) {
+                if (length(x$y>0) && x$y[1] == 67) x
+                else NULL}) %>%
+            .[sapply(.,Negate(is.null))] %>%
+            ## Removing page headers
+            lapply(function (x) {filter (x,y!=67)}) %>%
+            ## Inserting newlines and extracting text only
+            lapply (insert_newlines) %>%
+            unlist %>%
+            paste(collapse=" ") %>%
+            writeLines (outfile)
         return(sprintf("[%3d/%3d] Converted %s -> %s",
-                           nth,total,infile,outfile))}
+                       nth,total,infile,outfile))}
     else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
 
 convert_pdf <- function(nth,pdfs) {
@@ -97,7 +118,7 @@ convert_pdf <- function(nth,pdfs) {
 pdfs <- Sys.glob("./pdfs/*.pdf")
     
 convert_results <- 
-    future.apply::future_lapply(1:length(pdfs),
+    future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),
                                 function (x) {
                                     return_value <- convert_pdf(x,pdfs)
                                     print(return_value)
