@@ -8,6 +8,7 @@
 library(tidytext)
 library(tidyverse)
 library(hunspell)
+library(pdftools)
 library(textmineR)
 library(future.apply)
 plan(multisession)
@@ -81,15 +82,9 @@ if (! dir.exists("./txts")){
 
 pdf_to_txt <- function(infile,outfile,nth,total) {
     if (! file.exists(outfile)){
-        return_value <- system(sprintf("pdftotext %s %s 2>>./results/pdftotext_errors.txt",
-                                   infile,
-                                   outfile))
-        if (return_value != 0) {
-            return(sprintf("[%3d/%3d] Error while converting %s",
-                           nth,total,infile))} 
-        else {
-            return(sprintf("[%3d/%3d] Converted %s -> %s",
-                           nth,total,infile,outfile))}}
+        pdf_text(infile) %>% readr::read_lines() %>% writeLines(outfile)
+        return(sprintf("[%3d/%3d] Converted %s -> %s",
+                           nth,total,infile,outfile))}
     else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
 
 convert_pdf <- function(nth,pdfs) {
