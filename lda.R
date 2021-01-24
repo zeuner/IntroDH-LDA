@@ -94,7 +94,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- system("ls ./pdfs/*.pdf",intern=TRUE)
+pdfs <- Sys.glob("./pdfs/*.pdf")
     
 convert_results <- 
     future.apply::future_lapply(1:length(pdfs),
@@ -152,7 +152,7 @@ tidy_txt <- function(nth, files){
     writeLines(data,files[nth])
     }
         
-txts <- system("ls ./txts/*.txt",intern=TRUE)
+txts <- Sys.glob("./txts/*.txt")
 
 tidy_results <- 
     future.apply::future_lapply(1:length(txts),
