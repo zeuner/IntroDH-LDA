@@ -16,8 +16,31 @@ plan(multisession)
 ## -------------------------------------------------------------------
 ## Loading the parliamentary archive
 
+read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
+    result <- NA
+    while (is.na(result) && 0 < attempts) {
+        attempts <- attempts - 1
+        result <- tryCatch(
+            {
+                readLines(url)
+            },
+            error = function(cond) {
+                message("caught error:")
+                message(cond)
+                message("")
+                Sys.sleep(throttle)
+                return(NA)
+            }
+        )
+    }
+    if (is.na(result)) {
+        stop(paste("could not get URL ", url))
+    }
+    return(result)
+}
+
 parliament_archive <-
-    readLines("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
+    read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
 
 
 ## -------------------------------------------------------------------
