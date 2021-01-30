@@ -66,11 +66,34 @@ if (! dir.exists("./pdfs")){
     dir.create("./pdfs")}
 
 
+get_url_retrying <- function(URL, outfile, attempts = 5, throttle = 5) {
+    result <- NA
+    while (is.na(result) && 0 < attempts) {
+        attempts <- attempts - 1
+        result <- tryCatch(
+            {
+                download.file(URL, outfile, mode = "wb")
+            },
+            error = function(cond) {
+                message("caught error:")
+                message(cond)
+                message("")
+                Sys.sleep(throttle)
+                return(NA)
+            }
+        )
+    }
+    if (is.na(result)) {
+        stop(paste("could not get URL ", URL))
+    }
+    return(result)
+}
+
 download_file <- function(URL,outfile,nth,total) {
     if (file.exists(outfile)){
         outfile <- str_replace(outfile, ".pdf$", "_1.pdf")
         }
-    download.file(URL, outfile, mode = "wb")
+    get_url_retrying(URL, outfile, mode = "wb")
     return(sprintf("[%3d/%3d] Downloaded file %s",
                            nth,total,outfile ))}
 
