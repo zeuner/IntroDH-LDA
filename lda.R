@@ -109,8 +109,16 @@ if (! dir.exists("./results")){
     dir.create("./results")}
 
 ## Asynchronously downloading the pdf files
+#download_results <- 
+#    future.apply::future_lapply(1:length(links),
+#                                function(x) {
+#                                    return_value <- download_pdfs(x,links)
+#                                    print(return_value)
+#                                    return(return_value)})
+
+## for some reason, the tryCatch block doesn't work with future.apply
 download_results <- 
-    future.apply::future_lapply(1:length(links),
+    lapply(1:length(links),
                                 function(x) {
                                     return_value <- download_pdfs(x,links)
                                     print(return_value)
