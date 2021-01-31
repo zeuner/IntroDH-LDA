@@ -93,7 +93,7 @@ download_file <- function(URL,outfile,nth,total) {
     if (file.exists(outfile)){
         outfile <- str_replace(outfile, ".pdf$", "_1.pdf")
         }
-    get_url_retrying(URL, outfile, mode = "wb")
+    get_url_retrying(URL, outfile)
     return(sprintf("[%3d/%3d] Downloaded file %s",
                            nth,total,outfile ))}
 
