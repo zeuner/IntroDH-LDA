@@ -1,6 +1,6 @@
 ## Description: Extract topics from JSON-supplied debates
 ## Author: Isidor Zeuner
-## iz32mega@studserv.uni-leipzig.de
+## dh2021@quidecco.de
 ## For license see: https://mit-license.org
 ## -------------------------------------------------------------------
 
