@@ -135,5 +135,5 @@ result <- data.frame(id, data)
 
 exported <- toJSON(unname(split(result,1:nrow(result))))
 
-save(exported, file="hungary.json")
+write(exported, file="hungary.json")
 
