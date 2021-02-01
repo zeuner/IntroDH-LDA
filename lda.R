@@ -131,9 +131,9 @@ id <- Sys.glob("./txts/*.txt")
 
 data <- sapply(id, read_file)
 
-result <- data.frame(id, data)
+exported <- data.frame(id, data)
 
-exported <- toJSON(unname(split(result,1:nrow(result))))
+json <- toJSON(exported)
 
-write(exported, file="hungary.json")
+write(json, file="hungary.json")
 
