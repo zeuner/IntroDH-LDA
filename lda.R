@@ -16,8 +16,31 @@ plan(multisession)
 ## -------------------------------------------------------------------
 ## Loading the parliamentary archive
 
+read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
+    result <- NA
+    while (is.na(result) && 0 < attempts) {
+        attempts <- attempts - 1
+        result <- tryCatch(
+            {
+                readLines(url)
+            },
+            error = function(cond) {
+                message("caught error:")
+                message(cond)
+                message("")
+                Sys.sleep(throttle)
+                return(NA)
+            }
+        )
+    }
+    if (is.na(result)) {
+        stop(paste("could not get URL ", url))
+    }
+    return(result)
+}
+
 parliament_archive <-
-    readLines("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
+    read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
 
 
 ## -------------------------------------------------------------------
@@ -43,11 +66,34 @@ if (! dir.exists("./pdfs")){
     dir.create("./pdfs")}
 
 
+get_url_retrying <- function(URL, outfile, attempts = 5, throttle = 5) {
+    result <- NA
+    while (is.na(result) && 0 < attempts) {
+        attempts <- attempts - 1
+        result <- tryCatch(
+            {
+                download.file(URL, outfile, mode = "wb")
+            },
+            error = function(cond) {
+                message("caught error:")
+                message(cond)
+                message("")
+                Sys.sleep(throttle)
+                return(NA)
+            }
+        )
+    }
+    if (is.na(result)) {
+        stop(paste("could not get URL ", URL))
+    }
+    return(result)
+}
+
 download_file <- function(URL,outfile,nth,total) {
     if (file.exists(outfile)){
         outfile <- str_replace(outfile, ".pdf$", "_1.pdf")
         }
-    download.file(URL, outfile, mode = "wb")
+    get_url_retrying(URL, outfile)
     return(sprintf("[%3d/%3d] Downloaded file %s",
                            nth,total,outfile ))}
 
@@ -63,8 +109,16 @@ if (! dir.exists("./results")){
     dir.create("./results")}
 
 ## Asynchronously downloading the pdf files
+#download_results <- 
+#    future.apply::future_lapply(1:length(links),
+#                                function(x) {
+#                                    return_value <- download_pdfs(x,links)
+#                                    print(return_value)
+#                                    return(return_value)})
+
+## for some reason, the tryCatch block doesn't work with future.apply
 download_results <- 
-    future.apply::future_lapply(1:length(links),
+    lapply(1:length(links),
                                 function(x) {
                                     return_value <- download_pdfs(x,links)
                                     print(return_value)
