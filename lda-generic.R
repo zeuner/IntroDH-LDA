@@ -6,10 +6,13 @@
 
 library(readr)
 library(jsonlite)
+library(hunspell)
 library(SnowballC)
 library(textmineR)
 
 frame <- fromJSON(read_file("hungary.json"))
+
+stemming_function <- function (x) unlist(hunspell_stem(x,"hu_HU"))
 
 dtm <- CreateDtm(
     doc_vec = frame$data,
@@ -20,8 +23,8 @@ dtm <- CreateDtm(
     remove_punctuation = TRUE,
     remove_numbers = TRUE,
     verbose = FALSE,
-    stem_lemma_function = function(x) SnowballC::wordStem(x, "hungarian"),
-    cpus = 2
+    stem_lemma_function = stemming_function,
+    cpus = parallel::detectCores()
 )
 
 ## arbitrary seeding for reproducible output
