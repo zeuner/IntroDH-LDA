@@ -146,6 +146,15 @@ insert_newlines <- function (t) {
     spaces <- t$space
     mapply(newline, words, spaces)}
 
+unhyphenate <- function (data) {
+    trimws(data) %>%
+        paste(collapse="") %>% 
+        str_replace_all(pattern="-\n ?([^0-9 ]+) ",replacement="\\1\n") %>%
+        str_split("\n") %>%
+        sapply(trimws)
+        }
+
+
 pdf_to_txt <- function(infile,outfile,nth,total) {
     if (! file.exists(outfile)){
         pdf_data(infile) %>%
@@ -160,6 +169,8 @@ pdf_to_txt <- function(infile,outfile,nth,total) {
             lapply (insert_newlines) %>%
             unlist %>%
             paste(collapse=" ") %>%
+            unhyphenate %>%
+            trimws %>%
             writeLines (outfile)
         return(sprintf("[%3d/%3d] Converted %s -> %s",
                        nth,total,infile,outfile))}
