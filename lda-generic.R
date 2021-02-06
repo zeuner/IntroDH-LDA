@@ -41,7 +41,7 @@ model <- FitLdaModel(
     calc_likelihood = TRUE,
     calc_coherence = TRUE,
     calc_r2 = TRUE,
-    cpus = 2
+    cpus = parallel::detectCores()
 )
 
 ## sample output of top terms for each topic
