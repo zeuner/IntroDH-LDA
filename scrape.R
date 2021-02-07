@@ -29,6 +29,9 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
 ## cost time through refetching the cached content.
 cache_directory <- file.path(getwd(), "cached")
 
+if (! dir.exists(cache_directory)){
+    dir.create(cache_directory)}
+
 read_lines_html_caching <- function(url) {
     cache_file <- file.path(
         cache_directory,
