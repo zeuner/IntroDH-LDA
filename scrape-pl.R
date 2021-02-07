@@ -43,10 +43,8 @@ speeches_url <- function(legislatory_period_url) {
         }
     ) %>% unlist(
         recursive = FALSE
-    ) %>% (
-        function(x) {
-            do.call(c, x)
-        }
+    ) %>% do.call(
+        what = c
     )
 ## TODO: implement a way to handle the legislatory period from 1989 to 1991.
 ##    Here, there are only scanned steganographic protocols available,
@@ -100,10 +98,8 @@ legislatory_period_top_levels <- archive_top_level[
     )
 ) %>% map(
     speeches_url
-) %>% (
-    function(x) {
-        do.call(c, x)
-    }
+) %>% do.call(
+    what = c
 ) %>% append(
     current_legislatory_period_top_level
 )
@@ -168,6 +164,7 @@ orka_bottom_level <- function (top_level) {
     lines <- lines[
         grep("<frame.*name=\"Prawa\".*>", lines)
     ]
+    no_item <- "<NOBR></NOBR></td><td>((<P>|)Oświadczenia[.](</P>|)|)</td>"
     lines %>% map(
         partial(
             str_replace,
@@ -189,29 +186,23 @@ orka_bottom_level <- function (top_level) {
             orka_next_level,
             expand_pattern = "href=.*Expand=[0-9]*#"
         )
-    ) %>% (
-        function(x) {
-            do.call(c, x)
-        }
+    ) %>% do.call(
+        what = c
     ) %>% map(
         partial(
             orka_next_level,
             expand_pattern = "href=.*Expand=[0-9]*[.][0-9]*#"
         )
-    ) %>% (
-        function(x) {
-            do.call(c, x)
-        }
+    ) %>% do.call(
+        what = c
     ) %>% map(
         partial(
             orka_next_level,
             expand_pattern = "href=.*OpenDocument",
-            excluded_pattern = "<NOBR></NOBR></td><td>((<P>|)Oświadczenia[.](</P>|)|)</td>"
+            excluded_pattern = no_item
         )
-    ) %>% (
-        function(x) {
-            do.call(c, x)
-        }
+    ) %>% do.call(
+        what = c
     )
 }
 
@@ -228,6 +219,6 @@ orka_speech_item <- function(url) {
              pattern=".*>(.*) punkt porządku dziennego.*",
              replacement="\\1"
          )
-     ) 
+     )
      return (lines[[1]])
 }
