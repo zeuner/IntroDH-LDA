@@ -43,7 +43,7 @@ download_results <-
                print(return_value)
                return(return_value)})
                                                     
-writeLines(unlist(download_results),"./results/cz-download_results.txt")                                  
+writeLines(unlist(download_results), file.path(result_directory, "cz-download_results.txt"))
 
 
 ## ===================================================================
@@ -96,7 +96,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- Sys.glob("./pdfs/cz-*.pdf")
+pdfs <- Sys.glob(file.path(pdf_directory, "cz-*.pdf"))
     
 convert_results <- 
     future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),
@@ -105,9 +105,9 @@ convert_results <-
                                     print(return_value)
                                     return(return_value)})
 
-writeLines(unlist(convert_results),"./results/cz-convert_results.txt")
+writeLines(unlist(convert_results), file.path(result_directory, "cz-convert_results.txt"))
 
-id <- Sys.glob("./txts/cz-*.txt")
+id <- Sys.glob(file.path(txt_directory, "cz-*.txt"))
 
 data <- sapply(id, read_file)
 

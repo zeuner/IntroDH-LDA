@@ -41,7 +41,7 @@ download_results <-
                print(return_value)
                return(return_value)})
 
-writeLines(unlist(download_results),"./results/it-download_results.txt")
+writeLines(unlist(download_results), file.path(result_directory, "at-download_results.txt"))
 
 
 newline <- function (x,y) {
@@ -99,7 +99,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- Sys.glob("pdfs/at-*.pdf")
+pdfs <- Sys.glob(file.path(pdf_directory, "at-*.pdf"))
 
 convert_results <-
     future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),

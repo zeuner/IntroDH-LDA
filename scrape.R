@@ -23,9 +23,10 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
     return(result)
 }
 
-if (! dir.exists("./pdfs")){
-    dir.create("./pdfs")}
+pdf_directory <- file.path(getwd(), "pdfs")
 
+if (! dir.exists(pdf_directory)){
+    dir.create(pdf_directory)}
 
 get_url_retrying <- function(URL, outfile, attempts = 5, throttle = 5) {
     result <- NA
@@ -61,10 +62,12 @@ download_file <- function(URL,outfile,nth,total) {
 
 download_pdfs <- function(nth, links) {
     URL <- links[[nth]][1]
-    outfile <- sprintf("./pdfs/%s",links[[nth]][2])
+    outfile <- file.path(pdf_directory, links[[nth]][2])
     total <- length(links)
     return(download_file(URL,outfile,nth,total))}
 
 
-if (! dir.exists("./results")){
-    dir.create("./results")}
+result_directory <- file.path(getwd(), "results")
+
+if (! dir.exists(result_directory)){
+    dir.create(result_directory)}

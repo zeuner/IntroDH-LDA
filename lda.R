@@ -29,7 +29,7 @@ parliament_archive <-
 links <- parliament_archive[grep("/documents/10181/.*szám",parliament_archive)] %>%
     map(partial(str_replace,
                 pattern=".*(/documents/[^\"]*)\".*>.*(\\d{4}.+\\d{2}.+\\d{2}).*",
-                replacement="\\1\t\\2.pdf")) %>% # Extracting relative URL and date
+                replacement="\\1\thu-\\2.pdf")) %>% # Extracting relative URL and date
     map(partial(str_replace,
                 pattern=" ",
                 replacement="")) %>% # Correcting malformed dates
@@ -51,14 +51,16 @@ download_results <-
                                     print(return_value)
                                     return(return_value)})
                                                     
-writeLines(unlist(download_results),"./results/download_results.txt")                                  
+writeLines(unlist(download_results), file.path(result_directory, "hu-download_results.txt"))
 
 
 ## -------------------------------------------------------------------
 ## Converting all pdf files into txt files
 
-if (! dir.exists("./txts")){
-    dir.create("./txts")}
+txt_directory <- file.path(getwd(), "txts")
+
+if (! dir.exists(txt_directory)){
+    dir.create(txt_directory)}
 
 newline <- function (x,y) {
     if (!y) {
@@ -107,7 +109,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- Sys.glob("./pdfs/*.pdf")
+pdfs <- Sys.glob(file.path(pdf_directory, "hu-*.pdf"))
     
 convert_results <- 
     future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),
@@ -116,9 +118,9 @@ convert_results <-
                                     print(return_value)
                                     return(return_value)})
 
-writeLines(unlist(convert_results),"./results/convert_results.txt")
+writeLines(unlist(convert_results), file.path("hu-convert_results.txt"))
 
-id <- Sys.glob("./txts/*.txt")
+id <- Sys.glob(file.path(txt_directory, "hu-*.txt"))
 
 data <- sapply(id, read_file)
 
