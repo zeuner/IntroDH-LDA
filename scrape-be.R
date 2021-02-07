@@ -1,6 +1,6 @@
 ## -------------------------------------------------------------------
-## Downloading and tidying Czech parliamentary protocols from 2013-
-## 2017
+## Downloading and tidying Belgian parliamentary protocols from 2014-
+## 2019
 ## -------------------------------------------------------------------
 
 library(tidytext)
@@ -16,25 +16,24 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Loading the website
 
+Sys.setlocale("LC_ALL", "C")
 parliament_archive <-
-    read_lines_retrying("https://public.psp.cz/eknih/2013ps/tesnopis/index.htm")
+    read_lines_retrying("https://www.senate.be/www/?MIval=/publications/ListPub&LANG=fr&COLL=H&LEG=6&START=1&END=48")
 
 ## -------------------------------------------------------------------
 ## Extracting the links for the pdf files
 
-Sys.setlocale("LC_ALL", "C")
+links <- grep("\"/www/webdriver[^\"]+Obj=application/pdf[^\"]+[0-9]+\"",
+              parliament_archive, value=TRUE) %>%
+    lapply(FUN=function(x) {
+        str_replace(x, ".*\"(/www/webdriver[^\"]+Obj=application/pdf[^\"]+[0-9]+)\".*",
+                    "https://www.senate.be\\1")})
 
-links <- grep("tz[0-9]{3}\\.pdf",parliament_archive, value = TRUE) %>%
-    sapply(FUN=function(x) {
-        str_replace(x, ".*\"(tz[0-9]{3}\\.pdf)\".*", "\\1")}) %>%
-    sapply(FUN=function(x) {
-        paste(paste("https://public.psp.cz/eknih/2013ps/tesnopis/", x, sep=""),
-              paste("cz-", x, sep=""), sep="\t")}) %>%
-    str_split("\t")
+for (i in 1:length(links)) {
+    links[[i]] <- c(links[[i]], sprintf("be-%02d.pdf", i))
+}
 
-
-## -------------------------------------------------------------------
-## Downloading pdf files into pdfs directory
+## Downloading
 
 download_results <- 
     lapply(1:length(links),
@@ -43,11 +42,10 @@ download_results <-
                print(return_value)
                return(return_value)})
                                                     
-writeLines(unlist(download_results), file.path(result_directory, "cz-download_results.txt"))
+writeLines(unlist(download_results), file.path(result_directory, "be-download_results.txt"))
 
 
-## ===================================================================
-## Processing pdf files
+## Converting pdfs
 
 newline <- function (x,y) {
     if (!y) {
@@ -66,18 +64,38 @@ unhyphenate <- function (data) {
         str_split("\n") %>%
         sapply(trimws)}
 
-remove_page_numbering <- function (page) {
-                pageno_pos <- last(page$y)
-                x <- filter(page, y != pageno_pos)
-                if (length(x$text) == 0) {
-                    NULL
-                } else x }
+remove_header <- function (page) {
+    header_pos <- 41
+    x <- filter(page, y > header_pos)
+    if (length(x$text) == 0) {
+        NULL
+    } else x }
+
+only_french <- function (page) {
+    french_min_pos <- 300
+    filter(page, x > french_min_pos)}
+
+trim_content <- function (pages) {
+    start <- 1
+    end <- length(pages)
+    for (i in 1:length(pages)) {
+        first30words <- paste(pages[[i]]$text[1:30], collapse=" ")
+        if (grepl("\\(La séance est ouverte à", first30words)) {
+            start <- i
+            break }}
+    for (i in start:length(pages)) {
+        if (grepl("\\(La séance est levée à", paste(pages[[i]]$text, collapse=" "))){
+            end <- i
+            break }}
+    pages[start:end] }
 
 pdf_to_txt <- function(infile, outfile, nth, total) {
     if (! file.exists(outfile)){
         pdf_data(infile) %>%
-            lapply(remove_page_numbering) %>% 
+            lapply(remove_header) %>% 
             .[sapply(.,Negate(is.null))] %>% # removing empty pages
+            lapply(only_french) %>%
+            trim_content %>%
             lapply(insert_newlines) %>%
             unlist %>%
             paste(collapse=" ") %>%
@@ -96,7 +114,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- Sys.glob(file.path(pdf_directory, "cz-*.pdf"))
+pdfs <- Sys.glob(file.path(pdf_directory, "be-*.pdf"))
     
 convert_results <- 
     future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),
@@ -105,9 +123,9 @@ convert_results <-
                                     print(return_value)
                                     return(return_value)})
 
-writeLines(unlist(convert_results), file.path(result_directory, "cz-convert_results.txt"))
+writeLines(unlist(convert_results), file.path(result_directory, "be-convert_results.txt"))
 
-id <- Sys.glob(file.path(txt_directory, "cz-*.txt"))
+id <- Sys.glob(file.path(txt_directory, "be-*.txt"))
 
 data <- sapply(id, read_file)
 
@@ -115,6 +133,7 @@ exported <- data.frame(id, data)
 
 json <- toJSON(exported)
 
-write(json, file="czechia.json")
+write(json, file="belgium.json")
 
-
+    
+            

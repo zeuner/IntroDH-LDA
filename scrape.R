@@ -71,3 +71,8 @@ result_directory <- file.path(getwd(), "results")
 
 if (! dir.exists(result_directory)){
     dir.create(result_directory)}
+
+txt_directory <- file.path(getwd(), "txts")
+
+if (! dir.exists(txt_directory)){
+    dir.create(txt_directory)}

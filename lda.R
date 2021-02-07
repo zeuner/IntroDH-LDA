@@ -57,11 +57,6 @@ writeLines(unlist(download_results), file.path(result_directory, "hu-download_re
 ## -------------------------------------------------------------------
 ## Converting all pdf files into txt files
 
-txt_directory <- file.path(getwd(), "txts")
-
-if (! dir.exists(txt_directory)){
-    dir.create(txt_directory)}
-
 newline <- function (x,y) {
     if (!y) {
         paste(x,"\n",sep="")}
