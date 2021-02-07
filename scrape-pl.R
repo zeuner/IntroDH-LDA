@@ -61,13 +61,13 @@ speeches_url <- function(legislatory_period_url) {
             pattern=".*href=\"([^\"]*)\".*",
             replacement="\\1"
         )
-    ) %>% map( 
+    ) %>% map(
         partial(
             str_replace,
             pattern=".*HREF=\"([^\"]*)\".*",
             replacement="\\1"
         )
-    ) %>% map( 
+    ) %>% map(
         partial(
             str_replace,
             pattern="^(/)",
@@ -88,7 +88,7 @@ legislatory_period_top_levels <- archive_top_level[
         pattern=".*href=\"([^\"]*)\".*",
         replacement="\\1"
     )
-) %>% map( 
+) %>% map(
     partial(
         str_replace,
         pattern="^(/)",
@@ -107,3 +107,100 @@ legislatory_period_top_levels <- archive_top_level[
 ) %>% append(
     current_legislatory_period_top_level
 )
+
+orka_next_level <- function (current_level, expand_pattern) {
+    service <- url_service(
+        current_level
+    )
+    lines <- read_lines_retrying(
+        current_level
+    )
+    lines <- lines[
+        grep(expand_pattern, lines)
+    ]
+    lines %>% map(
+        partial(
+            str_replace,
+            pattern=".*href=\"([^\"]*)\".*",
+            replacement="\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace_all,
+            pattern="&amp;",
+            replacement="&"
+        )
+    ) %>% map(
+        partial(
+            str_replace,
+            pattern="^(/)",
+            replacement= paste(
+                service,
+                "\\1",
+                sep = ""
+            )
+        )
+    ) %>% map(
+        partial(
+            str_replace,
+            pattern="#.*",
+            replacement=""
+        )
+    )
+}
+
+orka_bottom_level <- function (top_level) {
+    service <- url_service(
+        top_level
+    )
+    lines <- read_lines_retrying(
+        top_level
+    )
+    lines <- lines[
+        grep("<frame.*name=\"Prawa\".*>", lines)
+    ]
+    lines %>% map(
+        partial(
+            str_replace,
+            pattern=".*src=\"([^\"]*)\".*",
+            replacement="\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace,
+            pattern="^(/)",
+            replacement= paste(
+                service,
+                "\\1",
+                sep = ""
+            )
+        )
+    ) %>% map(
+        partial(
+            orka_next_level,
+            expand_pattern = "href=.*Expand=[0-9]*#"
+        )
+    ) %>% (
+        function(x) {
+            do.call(c, x)
+        }
+    ) %>% map(
+        partial(
+            orka_next_level,
+            expand_pattern = "href=.*Expand=[0-9]*[.][0-9]*#"
+        )
+    ) %>% (
+        function(x) {
+            do.call(c, x)
+        }
+    ) %>% map(
+        partial(
+            orka_next_level,
+            expand_pattern = "href=.*OpenDocument"
+        )
+    ) %>% (
+        function(x) {
+            do.call(c, x)
+        }
+    )
+}
