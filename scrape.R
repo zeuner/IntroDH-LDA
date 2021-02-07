@@ -46,7 +46,7 @@ get_url_retrying <- function(URL, outfile, attempts = 5, throttle = 5) {
         )
     }
     if (is.na(result)) {
-        stop(paste("could not get URL ", URL))
+        return(paste("could not get URL ", URL))
     }
     return(result)
 }
