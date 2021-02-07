@@ -108,7 +108,11 @@ legislatory_period_top_levels <- archive_top_level[
     current_legislatory_period_top_level
 )
 
-orka_next_level <- function (current_level, expand_pattern) {
+orka_next_level <- function (
+    current_level,
+    expand_pattern,
+    excluded_pattern = NA
+) {
     service <- url_service(
         current_level
     )
@@ -118,6 +122,11 @@ orka_next_level <- function (current_level, expand_pattern) {
     lines <- lines[
         grep(expand_pattern, lines)
     ]
+    if (!is.na(excluded_pattern)) {
+        lines <- lines[
+            grep(excluded_pattern, lines, invert = TRUE)
+        ]
+    }
     lines %>% map(
         partial(
             str_replace,
@@ -196,11 +205,29 @@ orka_bottom_level <- function (top_level) {
     ) %>% map(
         partial(
             orka_next_level,
-            expand_pattern = "href=.*OpenDocument"
+            expand_pattern = "href=.*OpenDocument",
+            excluded_pattern = "<NOBR></NOBR></td><td>((<P>|)Oświadczenia[.](</P>|)|)</td>"
         )
     ) %>% (
         function(x) {
             do.call(c, x)
         }
     )
+}
+
+orka_speech_item <- function(url) {
+     lines <- read_lines_html_caching(
+         url
+     )
+     lines <- lines[
+         grep(">.* punkt porządku dziennego", lines)
+     ]
+     lines <- lines %>% map(
+         partial(
+             str_replace,
+             pattern=".*>(.*) punkt porządku dziennego.*",
+             replacement="\\1"
+         )
+     ) 
+     return (lines[[1]])
 }
