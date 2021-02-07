@@ -26,13 +26,13 @@ url_top_level_service <- url_service(
     url_top_level
 )
 
-archive_top_level <- read_lines_retrying(url_top_level)
+archive_top_level <- read_lines_html_caching(url_top_level)
 
 speeches_url <- function(legislatory_period_url) {
     legislatory_period_service <- url_service(
         legislatory_period_url
     )
-    lines <- read_lines_retrying(
+    lines <- read_lines_html_caching(
         legislatory_period_url
     ) %>% iconv(
         "latin1",
@@ -112,7 +112,7 @@ orka_next_level <- function (current_level, expand_pattern) {
     service <- url_service(
         current_level
     )
-    lines <- read_lines_retrying(
+    lines <- read_lines_html_caching(
         current_level
     )
     lines <- lines[
@@ -153,7 +153,7 @@ orka_bottom_level <- function (top_level) {
     service <- url_service(
         top_level
     )
-    lines <- read_lines_retrying(
+    lines <- read_lines_html_caching(
         top_level
     )
     lines <- lines[
