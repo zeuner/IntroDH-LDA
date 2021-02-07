@@ -13,34 +13,11 @@ library(jsonlite)
 library(textmineR)
 library(future.apply)
 plan(multisession)
+source("scrape.R")
 
-options(HTTPUserAgent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
 
 ## -------------------------------------------------------------------
 ## Loading the parliamentary archive
-
-read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
-    result <- NA
-    while (is.na(result) && 0 < attempts) {
-        attempts <- attempts - 1
-        result <- tryCatch(
-            {
-                readLines(url)
-            },
-            error = function(cond) {
-                message("caught error:")
-                message(cond)
-                message("")
-                Sys.sleep(throttle)
-                return(NA)
-            }
-        )
-    }
-    if (is.na(result)) {
-        stop(paste("could not get URL ", url))
-    }
-    return(result)
-}
 
 parliament_archive <-
     read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
@@ -52,7 +29,7 @@ parliament_archive <-
 links <- parliament_archive[grep("/documents/10181/.*szám",parliament_archive)] %>%
     map(partial(str_replace,
                 pattern=".*(/documents/[^\"]*)\".*>.*(\\d{4}.+\\d{2}.+\\d{2}).*",
-                replacement="\\1\t\\2.pdf")) %>% # Extracting relative URL and date
+                replacement="\\1\thu-\\2.pdf")) %>% # Extracting relative URL and date
     map(partial(str_replace,
                 pattern=" ",
                 replacement="")) %>% # Correcting malformed dates
@@ -61,65 +38,12 @@ links <- parliament_archive[grep("/documents/10181/.*szám",parliament_archive)]
     str_split(.,"\t")
 
 ## links: a list of character[2] vectors
+## [0]: URL
+## [1]: filename
 
 ## -------------------------------------------------------------------
 ## Downloading the pdf files into the pdfs directory
 
-if (! dir.exists("./pdfs")){
-    dir.create("./pdfs")}
-
-
-get_url_retrying <- function(URL, outfile, attempts = 5, throttle = 5) {
-    result <- NA
-    while (is.na(result) && 0 < attempts) {
-        attempts <- attempts - 1
-        result <- tryCatch(
-            {
-                download.file(URL, outfile, mode = "wb")
-            },
-            error = function(cond) {
-                message("caught error:")
-                message(cond)
-                message("")
-                Sys.sleep(throttle)
-                return(NA)
-            }
-        )
-    }
-    if (is.na(result)) {
-        stop(paste("could not get URL ", URL))
-    }
-    return(result)
-}
-
-download_file <- function(URL,outfile,nth,total) {
-    if (file.exists(outfile)){
-        outfile <- str_replace(outfile, ".pdf$", "_1.pdf")
-        }
-    get_url_retrying(URL, outfile)
-    return(sprintf("[%3d/%3d] Downloaded file %s",
-                           nth,total,outfile ))}
-
-
-download_pdfs <- function(nth, links) {
-    URL <- links[[nth]][1]
-    outfile <- sprintf("./pdfs/%s",links[[nth]][2])
-    total <- length(links)
-    return(download_file(URL,outfile,nth,total))}
-
-
-if (! dir.exists("./results")){
-    dir.create("./results")}
-
-## Asynchronously downloading the pdf files
-#download_results <- 
-#    future.apply::future_lapply(1:length(links),
-#                                function(x) {
-#                                    return_value <- download_pdfs(x,links)
-#                                    print(return_value)
-#                                    return(return_value)})
-
-## for some reason, the tryCatch block doesn't work with future.apply
 download_results <- 
     lapply(1:length(links),
                                 function(x) {
@@ -127,14 +51,11 @@ download_results <-
                                     print(return_value)
                                     return(return_value)})
                                                     
-writeLines(unlist(download_results),"./results/download_results.txt")                                  
+writeLines(unlist(download_results), file.path(result_directory, "hu-download_results.txt"))
 
 
 ## -------------------------------------------------------------------
 ## Converting all pdf files into txt files
-
-if (! dir.exists("./txts")){
-    dir.create("./txts")}
 
 newline <- function (x,y) {
     if (!y) {
@@ -183,7 +104,7 @@ convert_pdf <- function(nth,pdfs) {
     return(pdf_to_txt(infile,outfile,nth,total))
     }
 
-pdfs <- Sys.glob("./pdfs/*.pdf")
+pdfs <- Sys.glob(file.path(pdf_directory, "hu-*.pdf"))
     
 convert_results <- 
     future.apply::future_lapply(future.seed=TRUE,1:length(pdfs),
@@ -192,9 +113,9 @@ convert_results <-
                                     print(return_value)
                                     return(return_value)})
 
-writeLines(unlist(convert_results),"./results/convert_results.txt")
+writeLines(unlist(convert_results), file.path("hu-convert_results.txt"))
 
-id <- Sys.glob("./txts/*.txt")
+id <- Sys.glob(file.path(txt_directory, "hu-*.txt"))
 
 data <- sapply(id, read_file)
 
