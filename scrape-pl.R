@@ -222,3 +222,145 @@ orka_speech_item <- function(url) {
      )
      return (lines[[1]])
 }
+
+www_archive_pages <- function (top_level) {
+    lines <- read_lines_html_caching(
+        top_level
+    ) %>% map(
+        function(line) {
+            strsplit(line, "<a ")
+        }
+    ) %>% unlist(
+        recursive = FALSE
+    ) %>% do.call(
+        what = c
+    )
+    views <- lines[
+        grep("view:", lines)
+    ]
+    pages <- lines[
+        grep("data-page=", lines)
+    ] %>% map(
+        partial(
+            str_replace,
+            pattern=".*href=\"([^\"]*)\".*",
+            replacement="\\1"
+        )
+    )
+    urls <- pages[
+        !duplicated(pages)
+    ] %>% map(
+        partial(
+            str_replace,
+            pattern = "^",
+            replacement = top_level
+        )
+    )
+    if (0 == length(urls)) {
+        if (0 == length(views)) {
+            return (urls)
+        } else {
+            return (list(top_level))
+        }
+    } else {
+        return (urls)
+    }
+}
+
+www_archive_date_url <- function (archive_url) {
+    archive_path <- str_replace(
+        archive_url,
+        pattern = "/[^/]*$",
+        replacement = "/"
+    )
+    lines <- read_lines_html_caching(
+        archive_url
+    ) %>% map(
+        function(line) {
+            strsplit(line, "<a ")
+        }
+    ) %>% unlist(
+        recursive = FALSE
+    ) %>% do.call(
+        what = c
+    )
+    lines[
+        grep("posiedzenie[.]xsp", lines)
+    ] %>% map(
+        partial(
+            str_replace,
+            pattern = ".*href=\"([^\"]*)\".*",
+            replacement = "\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace_all,
+            pattern="&amp;",
+            replacement="&"
+        )
+    ) %>% map(
+        partial(
+            str_replace,
+            pattern  ="^([^/]*)$",
+            replacement = paste0(archive_path, "\\1")
+        )
+    )
+}
+
+www_archive_speech_url <- function (date_url) {
+    date_path <- str_replace(
+        date_url,
+        pattern = "/[^/]*$",
+        replacement = "/"
+    )
+    lines <- read_lines_html_caching(
+        date_url
+    ) %>% map(
+        function(line) {
+            strsplit(line, "<a ")
+        }
+    ) %>% unlist(
+        recursive = FALSE
+    ) %>% do.call(
+        what = c
+    )
+    lines <- lines[
+        grep("wypowiedz[.]xsp", lines)
+    ]
+    lines <- lines[
+        grep("</a>[^<>]*</td><td></td><td>", lines, invert = TRUE)
+    ]
+    lines %>% map(
+        partial(
+            str_replace,
+            pattern = ".*href=\"([^\"]*)\".*",
+            replacement = "\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace_all,
+            pattern="&amp;",
+            replacement="&"
+        )
+    ) %>% map(
+        partial(
+            str_replace,
+            pattern  ="^([^/]*)$",
+            replacement = paste0(date_path, "\\1")
+        )
+    )
+}
+
+www_archive_bottom_level <- function (top_level) {
+    www_archive_pages(
+        top_level
+    ) %>% map(
+        www_archive_date_url
+    ) %>% do.call(
+        what = c
+    ) %>% map(
+        www_archive_speech_url
+    ) %>% do.call(
+        what = c
+    )
+}
