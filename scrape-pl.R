@@ -364,3 +364,26 @@ www_archive_bottom_level <- function (top_level) {
         what = c
     )
 }
+
+www_archive_speech_item <- function(url) {
+     lines <- read_lines_html_caching(
+         url
+     )
+     lines <- lines[
+         grep(">.*[^.]([.]|) punkt porządku dziennego: *<", lines)
+     ]
+     lines <- lines %>% map(
+         partial(
+             str_replace,
+             pattern=".*>(.*[^.])([.]|) punkt porządku dziennego: *<.*",
+             replacement="\\1"
+         )
+     ) %>% map(
+         partial(
+             str_replace,
+             pattern="[.]",
+             replacement=""
+         )
+     )
+     return (lines[[1]])
+}
