@@ -207,35 +207,40 @@ orka_bottom_level <- function (top_level) {
 }
 
 orka_speech_data <- function(url) {
-     lines <- read_lines_html_caching(
-         url
-     )
-     item <- lines[
-         grep(">.* punkt porządku dziennego", lines)
-     ]
-     item <- item %>% map(
-         partial(
-             str_replace,
-             pattern=".*>(.*) punkt porządku dziennego.*",
-             replacement="\\1"
-         )
-     )
-     date <- lines[
-         grep(">.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-].*\\)", lines)
-     ]
-     date <- date %>% map(
-         partial(
-             str_replace,
-             pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\(.*[.-](.*)[.-](.*)\\).*",
-             replacement="\\1|\\2"
-         )
-     ) %>% map(
-         partial(
-             strsplit,
-             split = "\\|"
-	 )
-     )
-     return (c(item[[1]], date[[1]][[1]][2], date[[1]][[1]][1]))
+    lines <- read_lines_html_caching(
+        url
+    )
+    item <- lines[
+        grep(">.* punkt porządku dziennego", lines)
+    ]
+    item <- item %>% map(
+        partial(
+            str_replace,
+            pattern=".*>(.*) punkt porządku dziennego.*",
+            replacement="\\1"
+        )
+    )
+    date <- lines[
+        grep(">.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-].*\\)", lines)
+    ]
+    date <- date %>% map(
+        partial(
+            str_replace,
+            pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\((.*)[.-](.*)[.-](.*)\\).*",
+            replacement="\\1|\\2|\\3"
+        )
+    ) %>% map(
+        partial(
+            strsplit,
+            split = "\\|"
+        )
+    )
+    return (c(
+        item[[1]],
+        date[[1]][[1]][3],
+        date[[1]][[1]][2],
+	date[[1]][[1]][1]
+    ))
 }
 
 www_archive_pages <- function (top_level) {
@@ -381,41 +386,46 @@ www_archive_bottom_level <- function (top_level) {
 }
 
 www_archive_speech_data <- function(url) {
-     lines <- read_lines_html_caching(
-         url
-     )
-     item <- lines[
-         grep(">.*[^.]([.]|) punkt porządku dziennego: *<", lines)
-     ]
-     item <- item %>% map(
-         partial(
-             str_replace,
-             pattern=".*>(.*[^.])([.]|) punkt porządku dziennego: *<.*",
-             replacement="\\1"
-         )
-     ) %>% map(
-         partial(
-             str_replace_all,
-             pattern="[.]",
-             replacement=""
-         )
-     )
-     date <- lines[
-         grep(">Posiedzenie nr .* w dniu .*-.*-.* \\(.*[.] dzień obrad\\)<", lines)
-     ]
-     date <- date %>% map(
-         partial(
-             str_replace,
-             pattern=".*>Posiedzenie nr .* w dniu .*-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*",
-             replacement="\\1|\\2"
-         )
-     ) %>% map(
-         partial(
-             strsplit,
-             split = "\\|"
-         )
-     )
-     return (c(item[[1]], date[[1]][[1]][2], date[[1]][[1]][1]))
+    lines <- read_lines_html_caching(
+        url
+    )
+    item <- lines[
+        grep(">.*[^.]([.]|) punkt porządku dziennego: *<", lines)
+    ]
+    item <- item %>% map(
+        partial(
+            str_replace,
+            pattern=".*>(.*[^.])([.]|) punkt porządku dziennego: *<.*",
+            replacement="\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace_all,
+            pattern="[.]",
+            replacement=""
+        )
+    )
+    date <- lines[
+        grep(">Posiedzenie nr .* w dniu .*-.*-.* \\(.*[.] dzień obrad\\)<", lines)
+    ]
+    date <- date %>% map(
+        partial(
+            str_replace,
+            pattern=".*>Posiedzenie nr .* w dniu (.*)-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*",
+            replacement="\\1|\\2|\\3"
+        )
+    ) %>% map(
+        partial(
+            strsplit,
+            split = "\\|"
+        )
+    )
+    return (c(
+        item[[1]],
+        date[[1]][[1]][3],
+        date[[1]][[1]][2],
+        date[[1]][[1]][1]
+    ))
 }
 
 archive_bottom_level <- function (top_level) {
@@ -430,6 +440,7 @@ archive_bottom_level <- function (top_level) {
 ## - number of the item discussed
 ## - year (YYYY format)
 ## - month (MM format)
+## - day (DD format)
 archive_speech_data <- function(url) {
     if (0 == length(grep("orka", url))) {
         return (www_archive_speech_data(url))
