@@ -164,7 +164,7 @@ orka_bottom_level <- function (top_level) {
     lines <- lines[
         grep("<frame.*name=\"Prawa\".*>", lines)
     ]
-    no_item <- "<NOBR></NOBR></td><td>((<P>|)Oświadczenia[.](</P>|)|)</td>"
+    no_item <- "<NOBR></NOBR></td><td>(<P>|)(Oświadczenia[.]|)(</P>|)</td>"
     lines %>% map(
         partial(
             str_replace,
@@ -220,17 +220,22 @@ orka_speech_data <- function(url) {
              replacement="\\1"
          )
      )
-     year <- lines[
+     date <- lines[
          grep(">.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-].*\\)", lines)
      ]
-     year <- year %>% map(
+     date <- date %>% map(
          partial(
              str_replace,
-             pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-](.*)\\).*",
-             replacement="\\1"
+             pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\(.*[.-](.*)[.-](.*)\\).*",
+             replacement="\\1|\\2"
          )
+     ) %>% map(
+         partial(
+             strsplit,
+             split = "\\|"
+	 )
      )
-     return (c(item[[1]], year[[1]]))
+     return (c(item[[1]], date[[1]][[1]][2], date[[1]][[1]][1]))
 }
 
 www_archive_pages <- function (top_level) {
@@ -395,17 +400,22 @@ www_archive_speech_data <- function(url) {
              replacement=""
          )
      )
-     year <- lines[
+     date <- lines[
          grep(">Posiedzenie nr .* w dniu .*-.*-.* \\(.*[.] dzień obrad\\)<", lines)
      ]
-     year <- year %>% map(
+     date <- date %>% map(
          partial(
              str_replace,
-             pattern=".*>Posiedzenie nr .* w dniu .*-.*-(.*) \\(.*[.] dzień obrad\\)<.*",
-             replacement="\\1"
+             pattern=".*>Posiedzenie nr .* w dniu .*-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*",
+             replacement="\\1|\\2"
+         )
+     ) %>% map(
+         partial(
+             strsplit,
+             split = "\\|"
          )
      )
-     return (c(item[[1]], year[[1]]))
+     return (c(item[[1]], date[[1]][[1]][2], date[[1]][[1]][1]))
 }
 
 archive_bottom_level <- function (top_level) {
@@ -419,6 +429,7 @@ archive_bottom_level <- function (top_level) {
 ## extracts a vector from a speech url, consisting of:
 ## - number of the item discussed
 ## - year (YYYY format)
+## - month (MM format)
 archive_speech_data <- function(url) {
     if (0 == length(grep("orka", url))) {
         return (www_archive_speech_data(url))
