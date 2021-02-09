@@ -206,21 +206,31 @@ orka_bottom_level <- function (top_level) {
     )
 }
 
-orka_speech_item <- function(url) {
+orka_speech_data <- function(url) {
      lines <- read_lines_html_caching(
          url
      )
-     lines <- lines[
+     item <- lines[
          grep(">.* punkt porządku dziennego", lines)
      ]
-     lines <- lines %>% map(
+     item <- item %>% map(
          partial(
              str_replace,
              pattern=".*>(.*) punkt porządku dziennego.*",
              replacement="\\1"
          )
      )
-     return (lines[[1]])
+     year <- lines[
+         grep(">.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-].*\\)", lines)
+     ]
+     year <- year %>% map(
+         partial(
+             str_replace,
+             pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-](.*)\\).*",
+             replacement="\\1"
+         )
+     )
+     return (c(item[[1]], year[[1]]))
 }
 
 www_archive_pages <- function (top_level) {
@@ -365,14 +375,14 @@ www_archive_bottom_level <- function (top_level) {
     )
 }
 
-www_archive_speech_item <- function(url) {
+www_archive_speech_data <- function(url) {
      lines <- read_lines_html_caching(
          url
      )
-     lines <- lines[
+     item <- lines[
          grep(">.*[^.]([.]|) punkt porządku dziennego: *<", lines)
      ]
-     lines <- lines %>% map(
+     item <- item %>% map(
          partial(
              str_replace,
              pattern=".*>(.*[^.])([.]|) punkt porządku dziennego: *<.*",
@@ -380,10 +390,39 @@ www_archive_speech_item <- function(url) {
          )
      ) %>% map(
          partial(
-             str_replace,
+             str_replace_all,
              pattern="[.]",
              replacement=""
          )
      )
-     return (lines[[1]])
+     year <- lines[
+         grep(">Posiedzenie nr .* w dniu .*-.*-.* \\(.*[.] dzień obrad\\)<", lines)
+     ]
+     year <- year %>% map(
+         partial(
+             str_replace,
+             pattern=".*>Posiedzenie nr .* w dniu .*-.*-(.*) \\(.*[.] dzień obrad\\)<.*",
+             replacement="\\1"
+         )
+     )
+     return (c(item[[1]], year[[1]]))
+}
+
+archive_bottom_level <- function (top_level) {
+    if (0 == length(grep("orka", top_level))) {
+        return (www_archive_bottom_level(top_level))
+    } else {
+        return (orka_bottom_level(top_level))
+    }
+}
+
+## extracts a vector from a speech url, consisting of:
+## - number of the item discussed
+## - year (YYYY format)
+archive_speech_data <- function(url) {
+    if (0 == length(grep("orka", url))) {
+        return (www_archive_speech_data(url))
+    } else {
+        return (orka_speech_data(url))
+    }
 }
