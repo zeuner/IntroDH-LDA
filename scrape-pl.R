@@ -5,6 +5,7 @@
 ## -------------------------------------------------------------------
 
 library(tidyverse)
+library(jsonlite)
 source("scrape.R")
 
 ## -------------------------------------------------------------------
@@ -70,20 +71,14 @@ speeches_url <- function(legislatory_period_url) {
 
 legislatory_period_top_levels <- archive_top_level[
     grep(">Prace Sejmu<", archive_top_level)
-] %>% map(
-    partial(
-        str_replace,
-        pattern = ".*href=\"([^\"]*)\".*",
-        replacement = "\\1"
-    )
-) %>% map(
-    partial(
-        str_replace,
-        pattern = "^(/)",
-        replacement= paste0(
-            url_top_level_service,
-            "\\1"
-        )
+] %>% str_replace(
+    pattern = ".*href=\"([^\"]*)\".*",
+    replacement = "\\1"
+) %>% str_replace(
+    pattern = "^(/)",
+    replacement = paste0(
+        url_top_level_service,
+        "\\1"
     )
 ) %>% map(
     speeches_url
@@ -504,3 +499,26 @@ archive_debate_data_frame <- function(urls) {
     )
     return (frame)
 }
+
+data <- legislatory_period_top_levels %>% map(
+    archive_bottom_level
+) %>% do.call(
+    what = c
+) %>% archive_debate_data_frame
+
+exported <- data.frame(
+    id = paste(
+        data$year,
+        data$month,
+        data$day,
+        data$item
+    ) %>% str_replace_all(
+        pattern = "[^0-9]",
+        replacement = "_"
+    ),
+    data = data$debate_text
+)
+
+json <- toJSON(exported)
+
+write(json, file="poland.json")
