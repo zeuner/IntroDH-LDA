@@ -216,18 +216,22 @@ orka_speech_data <- function(url) {
     item <- item %>% map(
         partial(
             str_replace,
-            pattern=".*>(.*) punkt porządku dziennego.*",
-            replacement="\\1"
+            pattern = ".*>(.*) punkt porządku dziennego.*",
+            replacement = "\\1"
         )
     )
+    meeting <- ">.* kadencja, .* posiedzenie, .* dzień"
     date <- lines[
-        grep(">.* kadencja, .* posiedzenie, .* dzień \\(.*[.-].*[.-].*\\)", lines)
+        grep(
+            paste0(meeting, " \\(.*[.-].*[.-].*\\)"),
+            lines
+        )
     ]
     date <- date %>% map(
         partial(
             str_replace,
-            pattern=".*>.* kadencja, .* posiedzenie, .* dzień \\((.*)[.-](.*)[.-](.*)\\).*",
-            replacement="\\1|\\2|\\3"
+            pattern = paste0(".*", meeting, " \\((.*)[.-](.*)[.-](.*)\\).*"),
+            replacement = "\\1|\\2|\\3"
         )
     ) %>% map(
         partial(
@@ -235,11 +239,32 @@ orka_speech_data <- function(url) {
             split = "\\|"
         )
     )
+    start <- grep("(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">.*:</P>)", lines)
+    post_end <- grep("^Przebieg posiedzenia$", lines) %>% tail(n = 1)
+    end <- grep("^<BR>$", lines)
+    end <- Filter(
+        function (x) {
+            x < post_end
+        },
+        end
+    ) %>% max
+    text <- lines[
+        start : (end - 1)
+    ] %>% str_replace(
+        pattern = "<P( [^<>]*|)>",
+        replacement = "\n"
+    ) %>% str_replace_all(
+        pattern = "<[^<>]*>",
+        replacement = ""
+    ) %>% paste0(
+        collapse = "\n"
+    )
     return (c(
         item[[1]],
         date[[1]][[1]][3],
         date[[1]][[1]][2],
-	date[[1]][[1]][1]
+        date[[1]][[1]][1],
+	text
     ))
 }
 
@@ -405,14 +430,19 @@ www_archive_speech_data <- function(url) {
             replacement=""
         )
     )
+    meeting <- ">Posiedzenie nr .* w dniu"
     date <- lines[
-        grep(">Posiedzenie nr .* w dniu .*-.*-.* \\(.*[.] dzień obrad\\)<", lines)
+        grep(paste0(meeting, " .*-.*-.* \\(.*[.] dzień obrad\\)<"), lines)
     ]
     date <- date %>% map(
         partial(
             str_replace,
-            pattern=".*>Posiedzenie nr .* w dniu (.*)-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*",
-            replacement="\\1|\\2|\\3"
+            pattern = paste0(
+                ".*",
+                meeting,
+                " (.*)-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*"
+            ),
+            replacement = "\\1|\\2|\\3"
         )
     ) %>% map(
         partial(
@@ -420,11 +450,40 @@ www_archive_speech_data <- function(url) {
             split = "\\|"
         )
     )
+    end_pattern <- "<a [^<>]*href=[^<>]*>.*Przebieg posiedzenia.*</a>"
+    one_line_stenogram <- lines[
+        grep(
+            paste0("<div class=\"stenogram\">.*", end_pattern),
+            lines
+        )
+    ]
+    if (0 < length(one_line_stenogram)) {
+        lines_text <- strsplit(
+            one_line_stenogram,
+            "</(h2|P)>"
+        )[[1]]
+    } else {
+        lines_text <- lines
+    }
+    start <- grep("<h2( class=\"mowca\"|)>.*:", lines_text) %>% tail(n = 1)
+    end <- grep(end_pattern, lines_text)
+    text <- lines_text[
+        start : (end - 1)
+    ] %>% str_replace(
+        pattern = "<(h2|[pP])( [^<>]*|)>",
+        replacement = "\n"
+    ) %>% str_replace_all(
+        pattern = "<[^<>]*>",
+        replacement = ""
+    ) %>% paste0(
+        collapse = "\n"
+    )
     return (c(
         item[[1]],
         date[[1]][[1]][3],
         date[[1]][[1]][2],
-        date[[1]][[1]][1]
+        date[[1]][[1]][1],
+        text
     ))
 }
 
@@ -441,6 +500,7 @@ archive_bottom_level <- function (top_level) {
 ## - year (YYYY format)
 ## - month (MM format)
 ## - day (DD format)
+## - text of the speech
 archive_speech_data <- function(url) {
     if (0 == length(grep("orka", url))) {
         return (www_archive_speech_data(url))
