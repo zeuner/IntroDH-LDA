@@ -53,26 +53,17 @@ speeches_url <- function(legislatory_period_url) {
     lines <- lines[
         grep(">[^<>]*Wypowiedzi[^<>]*<", lines)
     ]
-    lines %>% map(
-        partial(
-            str_replace,
-            pattern = ".*href=\"([^\"]*)\".*",
-            replacement = "\\1"
-        )
-    ) %>% map(
-        partial(
-            str_replace,
-            pattern = ".*HREF=\"([^\"]*)\".*",
-            replacement = "\\1"
-        )
-    ) %>% map(
-        partial(
-            str_replace,
-            pattern = "^(/)",
-            replacement= paste0(
-                legislatory_period_service,
-                "\\1"
-            )
+    lines %>% str_replace(
+        pattern = ".*href=\"([^\"]*)\".*",
+        replacement = "\\1"
+    ) %>% str_replace(
+        pattern = ".*HREF=\"([^\"]*)\".*",
+        replacement = "\\1"
+    ) %>% str_replace(
+        pattern = "^(/)",
+        replacement= paste0(
+            legislatory_period_service,
+            "\\1"
         )
     )
 }
@@ -254,7 +245,7 @@ orka_speech_data <- function(url) {
         date[[1]][[1]][3],
         date[[1]][[1]][2],
         date[[1]][[1]][1],
-	text
+        text
     ))
 }
 
@@ -498,6 +489,18 @@ archive_speech_data_frame <- function(urls) {
         month = unlist(map(data,function(row){row[3]})),
         day = unlist(map(data,function(row){row[4]})),
         text = unlist(map(data,function(row){row[5]}))
+    )
+    return (frame)
+}
+
+archive_debate_data_frame <- function(urls) {
+    frame <- urls %>% archive_speech_data_frame %>% group_by(
+        item,
+        year,
+        month,
+        day
+    ) %>% summarize(
+        debate_text = paste(text, collapse = "\n")
     )
     return (frame)
 }
