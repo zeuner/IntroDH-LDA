@@ -69,10 +69,9 @@ speeches_url <- function(legislatory_period_url) {
         partial(
             str_replace,
             pattern = "^(/)",
-            replacement= paste(
+            replacement= paste0(
                 legislatory_period_service,
-                "\\1",
-                sep = ""
+                "\\1"
             )
         )
     )
@@ -90,10 +89,9 @@ legislatory_period_top_levels <- archive_top_level[
     partial(
         str_replace,
         pattern = "^(/)",
-        replacement= paste(
+        replacement= paste0(
             url_top_level_service,
-            "\\1",
-            sep = ""
+            "\\1"
         )
     )
 ) %>% map(
@@ -139,10 +137,9 @@ orka_next_level <- function (
         partial(
             str_replace,
             pattern = "^(/)",
-            replacement= paste(
+            replacement= paste0(
                 service,
-                "\\1",
-                sep = ""
+                "\\1"
             )
         )
     ) %>% map(
@@ -165,21 +162,14 @@ orka_bottom_level <- function (top_level) {
         grep("<frame.*name=\"Prawa\".*>", lines)
     ]
     no_item <- "<NOBR></NOBR></td><td>(<P>|)(Oświadczenia[.]|)(</P>|)</td>"
-    lines %>% map(
-        partial(
-            str_replace,
-            pattern = ".*src=\"([^\"]*)\".*",
-            replacement = "\\1"
-        )
-    ) %>% map(
-        partial(
-            str_replace,
-            pattern = "^(/)",
-            replacement= paste(
-                service,
-                "\\1",
-                sep = ""
-            )
+    lines %>% str_replace(
+        pattern = ".*src=\"([^\"]*)\".*",
+        replacement = "\\1"
+    ) %>% str_replace(
+        pattern = "^(/)",
+        replacement= paste0(
+            service,
+            "\\1"
         )
     ) %>% map(
         partial(
@@ -331,24 +321,15 @@ www_archive_date_url <- function (archive_url) {
     )
     lines[
         grep("posiedzenie[.]xsp", lines)
-    ] %>% map(
-        partial(
-            str_replace,
-            pattern = ".*href=\"([^\"]*)\".*",
-            replacement = "\\1"
-        )
-    ) %>% map(
-        partial(
-            str_replace_all,
-            pattern = "&amp;",
-            replacement = "&"
-        )
-    ) %>% map(
-        partial(
-            str_replace,
-            pattern  ="^([^/]*)$",
-            replacement = paste0(archive_path, "\\1")
-        )
+    ] %>% str_replace(
+        pattern = ".*href=\"([^\"]*)\".*",
+        replacement = "\\1"
+    ) %>% str_replace_all(
+        pattern = "&amp;",
+        replacement = "&"
+    ) %>% str_replace(
+        pattern  ="^([^/]*)$",
+        replacement = paste0(archive_path, "\\1")
     )
 }
 
@@ -507,4 +488,16 @@ archive_speech_data <- function(url) {
     } else {
         return (orka_speech_data(url))
     }
+}
+
+archive_speech_data_frame <- function(urls) {
+    data <- map(urls, archive_speech_data)
+    frame <- data.frame(
+        item = unlist(map(data,function(row){row[1]})),
+        year = unlist(map(data,function(row){row[2]})),
+        month = unlist(map(data,function(row){row[3]})),
+        day = unlist(map(data,function(row){row[4]})),
+        text = unlist(map(data,function(row){row[5]}))
+    )
+    return (frame)
 }
