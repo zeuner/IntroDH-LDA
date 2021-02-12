@@ -23,6 +23,38 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
     return(result)
 }
 
+## read_lines_html_caching implements caching for HTML content that is expected
+## to be immutable on the server side. Deleting the contents of the
+## cache_directory should not change the output of scripts at all, but might
+## cost time through refetching the cached content.
+cache_directory <- file.path(getwd(), "cached")
+
+if (! dir.exists(cache_directory)){
+    dir.create(cache_directory)}
+
+read_lines_html_caching <- function(url) {
+    cache_file <- file.path(
+        cache_directory,
+        paste0(digest(url, algo = "sha256"), ".html")
+    )
+    if (file.exists(cache_file)) {
+        return (readLines(cache_file))
+    }
+    retrieved <- read_lines_retrying(url)
+    html_completed <- length(
+        grep("</html>", retrieved)
+    ) + length(
+        grep("</HTML>", retrieved)
+    )
+    if (1 == html_completed) {
+        writeLines(
+            retrieved,
+            cache_file
+        )
+    }
+    return (retrieved)
+}
+
 pdf_directory <- file.path(getwd(), "pdfs")
 
 if (! dir.exists(pdf_directory)){
