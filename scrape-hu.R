@@ -44,6 +44,7 @@ links <- parliament_archive[grep("/documents/10181/.*szám",parliament_archive)]
 ## -------------------------------------------------------------------
 ## Downloading the pdf files into the pdfs directory
 
+## https://stackoverflow.com/questions/66083734/handling-exceptions-using-trycatch-inside-future-applyfuture-lapply
 download_results <- 
     lapply(1:length(links),
                                 function(x) {
