@@ -40,13 +40,25 @@ read_lines_html_caching <- function(url) {
     if (file.exists(cache_file)) {
         return (readLines(cache_file))
     }
-    retrieved <- read_lines_retrying(url)
+    retrieval_success <- FALSE
+    attempts <- 0
+    while (!retrieval_success && attempts < 5) {
+        attempts <- attempts + 1
+        retrieved <- read_lines_retrying(url)
+        http_error <- length(
+            grep(">Error 500<", retrieved)
+        )
+        retrieval_success <- 0 == http_error
+        if (!retrieval_success) {
+            Sys.sleep(5)
+        }
+    }
     html_completed <- length(
         grep("</html>", retrieved)
     ) + length(
         grep("</HTML>", retrieved)
     )
-    if (1 == html_completed) {
+    if (retrieval_success && (1 == html_completed)) {
         writeLines(
             retrieved,
             cache_file
