@@ -397,9 +397,9 @@ www_archive_speech_data <- function(url) {
             replacement = ""
         )
     )
-    meeting <- ">Posiedzenie nr .* w dniu"
+    meeting <- ">(Posiedzenie nr .*|Zgromadzenie Narodowe) w dniu"
     date <- lines[
-        grep(paste0(meeting, " .*-.*-.* \\(.*[.] dzień obrad\\)<"), lines)
+        grep(paste0(meeting, " .*-.*-[0-9]*( \\(.*[.] dzień obrad\\)|)<"), lines)
     ]
     date <- date %>% map(
         partial(
@@ -407,9 +407,9 @@ www_archive_speech_data <- function(url) {
             pattern = paste0(
                 ".*",
                 meeting,
-                " (.*)-(.*)-(.*) \\(.*[.] dzień obrad\\)<.*"
+                " (.*)-(.*)-([0-9]*)( \\(.*[.] dzień obrad\\)|)<.*"
             ),
-            replacement = "\\1|\\2|\\3"
+            replacement = "\\2|\\3|\\4"
         )
     ) %>% map(
         partial(
