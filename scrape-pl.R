@@ -185,6 +185,9 @@ orka_bottom_level <- function (top_level) {
 orka_speech_data <- function(url) {
     lines <- read_lines_html_caching(
         url
+    ) %>% str_replace(
+        pattern = "<B><FONT SIZE=\"[+]1\">([^<>]*)</B>([^<>]*)</FONT>",
+        replacement = "<B><FONT SIZE=\"+1\">\\1\\2</FONT></B>"
     )
     item <- lines[
         grep(">.* punkt porządku dziennego", lines)
@@ -215,7 +218,10 @@ orka_speech_data <- function(url) {
             split = "\\|"
         )
     )
-    start <- grep("(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">.*:</P>)", lines)
+    start <- grep(
+        "(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">.*:</P>)",
+        lines
+    )
     post_end <- grep(
         "^(Przebieg posiedzenia|Przejście do dokumentu głównego)$",
         lines
