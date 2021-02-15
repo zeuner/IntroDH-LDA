@@ -216,7 +216,10 @@ orka_speech_data <- function(url) {
         )
     )
     start <- grep("(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">.*:</P>)", lines)
-    post_end <- grep("^Przebieg posiedzenia$", lines) %>% tail(n = 1)
+    post_end <- grep(
+        "^(Przebieg posiedzenia|Przejście do dokumentu głównego)$",
+        lines
+    ) %>% tail(n = 1)
     end <- grep("^<BR>$", lines)
     end <- Filter(
         function (x) {
