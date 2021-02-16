@@ -189,16 +189,37 @@ orka_speech_data <- function(url) {
         pattern = "<B><FONT SIZE=\"[+]1\">([^<>]*)</B>([^<>]*)</FONT>(</B>|)",
         replacement = "<B><FONT SIZE=\"+1\">\\1\\2</FONT></B>"
     )
-    item <- lines[
+    item_regular <- lines[
         grep(">.* punkt porządku dziennego", lines)
     ]
-    item <- item %>% map(
+    item_regular <- item_regular %>% map(
         partial(
             str_replace,
             pattern = ".*>(.*) punkt porządku dziennego.*",
             replacement = "\\1"
         )
     )
+    item_special <- lines[
+        grep(">.*\\(punkty .* porządku dziennego\\)", lines)
+    ]
+    item_special <- item_special %>% map(
+        partial(
+            str_replace,
+            pattern = ".*>.*\\(punkty (.*) porządku dziennego\\).*",
+            replacement = "\\1"
+        )
+    ) %>% map(
+        partial(
+            str_replace_all,
+            pattern = "[.]",
+            replacement = ""
+        )
+    )
+    if (0 == length(item_regular)) {
+        item <- item_special
+    } else {
+        item <- item_regular
+    }
     meeting <- ">.* kadencja, (.* posiedzenie, .* dzień| Zgromadzenie Narodowe)"
     date <- lines[
         grep(
