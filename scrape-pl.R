@@ -220,7 +220,7 @@ orka_speech_data <- function(url) {
     } else {
         item <- item_regular
     }
-    meeting <- ">.* kadencja, (.* posiedzenie, .* dzień| Zgromadzenie Narodowe)"
+    meeting <- ">.* kadencja, (.* posiedzenie, .* dzień| *Zgromadzenie Narodowe)"
     date <- lines[
         grep(
             paste0(meeting, " \\(.*[.-].*[.-].*\\)"),
