@@ -186,7 +186,7 @@ orka_speech_data <- function(url) {
     lines <- read_lines_html_caching(
         url
     ) %>% str_replace(
-        pattern = "<B><FONT SIZE=\"[+]1\">([^<>]*)</B>([^<>]*)</FONT>",
+        pattern = "<B><FONT SIZE=\"[+]1\">([^<>]*)</B>([^<>]*)</FONT>(</B>|)",
         replacement = "<B><FONT SIZE=\"+1\">\\1\\2</FONT></B>"
     )
     item <- lines[
