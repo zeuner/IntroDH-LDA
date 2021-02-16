@@ -244,7 +244,7 @@ orka_speech_data <- function(url) {
         lines
     )
     post_end <- grep(
-        "^(Przebieg posiedzenia|Przejście do dokumentu głównego)$",
+        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |)|Przejście do dokumentu głównego)$",
         lines
     ) %>% tail(n = 1)
     end <- grep("^<BR>$", lines)
