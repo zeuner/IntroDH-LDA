@@ -147,7 +147,8 @@ orka_bottom_level <- function (top_level) {
     lines <- lines[
         grep("<frame.*name=\"Prawa\".*>", lines)
     ]
-    no_item <- "<NOBR></NOBR></td><td>(<P>|)(Oświadczenia[.]|)(</P>|)</td>"
+## should "Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000. rocznicę Zjazdu Gnieźnieńskiego." be treated as an item?
+    no_item <- "<NOBR></NOBR></td><td>(<P>|)(Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000[.] rocznicę Zjazdu Gnieźnieńskiego[.]|Oświadczenia[.]|)(</P>|)</td>"
     lines %>% str_replace(
         pattern = ".*src=\"([^\"]*)\".*",
         replacement = "\\1"
@@ -244,7 +245,7 @@ orka_speech_data <- function(url) {
         lines
     )
     post_end <- grep(
-        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |-|)|Przejście do dokumentu głównego)$",
+        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |az objął import mączki zwierzęcej z |-|)|Przejście do dokumentu głównego)$",
         lines
     ) %>% tail(n = 1)
     end <- grep("^<BR>$", lines)
