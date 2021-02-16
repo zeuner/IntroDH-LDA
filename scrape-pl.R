@@ -245,7 +245,7 @@ orka_speech_data <- function(url) {
         lines
     )
     post_end <- grep(
-        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |az objął import mączki zwierzęcej z |-|)|Przejście do dokumentu głównego)$",
+        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |az objął import mączki zwierzęcej z |ury pozainformatycznej. W |-|)|Przejście do dokumentu głównego)$",
         lines
     ) %>% tail(n = 1)
     end <- grep("^<BR>$", lines)
