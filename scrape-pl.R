@@ -147,8 +147,8 @@ orka_bottom_level <- function (top_level) {
     lines <- lines[
         grep("<frame.*name=\"Prawa\".*>", lines)
     ]
-## should "Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000. rocznicę Zjazdu Gnieźnieńskiego." be treated as an item?
-    no_item <- "<NOBR></NOBR></td><td>(<P>|)(Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000[.] rocznicę Zjazdu Gnieźnieńskiego[.]|Oświadczenia[.]|)(</P>|)</td>"
+## should "Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000. rocznicę Zjazdu Gnieźnieńskiego." and "Debata nad przedstawionymi przez Komisję Konstytucyjną Zgromadzenia Narodowego zasadniczymi kwestiami ustrojowymi (druk nr 649)." be treated as an item?
+    no_item <- "(<NOBR></NOBR></td><td>(<P>|)(Projekt uchwały Sejmu Rzeczypospolitej Polskiej w 1000[.] rocznicę Zjazdu Gnieźnieńskiego[.]|Debata nad przedstawionymi przez Komisję Konstytucyjną Zgromadzenia Narodowego zasadniczymi kwestiami ustrojowymi \\(druk nr 649\\)[.]|Oświadczenia[.]|)(</P>|)</td>|3a738135ddb17882c1257490004b53d5|a376f14c3c633829c12574f1003f7261)"
     lines %>% str_replace(
         pattern = ".*src=\"([^\"]*)\".*",
         replacement = "\\1"
@@ -190,9 +190,8 @@ orka_speech_data <- function(url) {
         pattern = "<B><FONT SIZE=\"[+]1\">([^<>]*)</B>([^<>]*)</FONT>(</B>|)",
         replacement = "<B><FONT SIZE=\"+1\">\\1\\2</FONT></B>"
     )
-    item_regular <- lines[
-        grep(">.* punkt porządku dziennego", lines)
-    ]
+    item_regular_index <- grep(">.* punkt porządku dziennego", lines)
+    item_regular <- lines[item_regular_index]
     item_regular <- item_regular %>% map(
         partial(
             str_replace,
@@ -200,9 +199,8 @@ orka_speech_data <- function(url) {
             replacement = "\\1"
         )
     )
-    item_special <- lines[
-        grep(">.*\\(punkty .* porządku dziennego\\)", lines)
-    ]
+    item_special_index <- grep(">.*\\(punkty .* porządku dziennego\\)", lines)
+    item_special <- lines[item_special_index]
     item_special <- item_special %>% map(
         partial(
             str_replace,
@@ -218,8 +216,10 @@ orka_speech_data <- function(url) {
     )
     if (0 == length(item_regular)) {
         item <- item_special
+        item_index <- item_special_index
     } else {
         item <- item_regular
+        item_index <- item_regular_index
     }
     meeting <- ">.* kadencja, (.* posiedzenie, .* dzień| *Zgromadzenie Narodowe)"
     date <- lines[
@@ -241,11 +241,14 @@ orka_speech_data <- function(url) {
         )
     )
     start <- grep(
-        "(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">.*:</P>)",
+        "(<P><B><FONT SIZE=\"[+]1\">.*:</FONT></B></P>|<P class=\"mowca\">(.*</P>|[^<>]*$))",
         lines
     )
+    if (0 == length(start)) {
+        start <- item_index + 1
+    }
     post_end <- grep(
-        "^(Przebieg posiedzenia(alności  warunki wota powinna być jednak |az objął import mączki zwierzęcej z |ury pozainformatycznej. W |-|)|Przejście do dokumentu głównego)$",
+         "<A HREF=\"[^\"]*/main/[^\"]*\">",
         lines
     ) %>% tail(n = 1)
     end <- grep("^<BR>$", lines)

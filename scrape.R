@@ -2,7 +2,7 @@ options(HTTPUserAgent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (
 
 read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
     result <- NA
-    while (is.na(result) && 0 < attempts) {
+    while ((0 == length(result) || is.na(result)) && 0 < attempts) {
         attempts <- attempts - 1
         result <- tryCatch(
             {
@@ -17,7 +17,7 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
             }
         )
     }
-    if (is.na(result)) {
+    if (0 == length(result) || is.na(result)) {
         stop(paste("could not get URL ", url))
     }
     return(result)
