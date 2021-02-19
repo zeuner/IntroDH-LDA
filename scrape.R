@@ -111,6 +111,22 @@ download_pdfs <- function(nth, links) {
     return(download_file(URL,outfile,nth,total))}
 
 
+url_service <- function(url) {
+    str_replace(
+        url,
+        pattern = "^([^/:]*://[^/]*)(/.*|$)",
+        replacement = "\\1"
+    )
+}
+
+url_directory <- function(url) {
+    str_replace(
+        url,
+        pattern = "[^/]*$",
+        replacement = ""
+    )
+}
+
 result_directory <- file.path(getwd(), "results")
 
 if (! dir.exists(result_directory)){

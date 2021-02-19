@@ -15,14 +15,6 @@ url_top_level <- "http://www.sejm.gov.pl/Sejm9.nsf/page.xsp/archiwum"
 
 current_legislatory_period_top_level <- "http://www.sejm.gov.pl/Sejm9.nsf/wypowiedzi.xsp"
 
-url_service <- function(url) {
-    str_replace(
-        url,
-        pattern = "^([^/:]*://[^/]*)(/.*|$)",
-        replacement = "\\1"
-    )
-}
-
 url_top_level_service <- url_service(
     url_top_level
 )
