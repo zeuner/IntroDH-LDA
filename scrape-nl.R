@@ -66,6 +66,12 @@ top_level_sessions <- function (page) {
             ] %>% str_replace(
                 pattern = ".*<span class=\"strong\">(.*)</span>.*",
                 replacement = "\\1"
+            ) %>% str_replace(
+                pattern = " - (.*) (.*) (.*) (.*) (.*) uur",
+                replacement = "%\\1%\\2%\\3%\\4%\\5"
+            ) %>% str_replace(
+                pattern = "^(.*) (.*) (.*) (.*) (.*) uur",
+                replacement = "unspecified%\\1%\\2%\\3%\\4%\\5"
             )
             report_link_line <- Filter(
                 function (line) {
@@ -96,4 +102,6 @@ top_level_sessions <- function (page) {
 map(
     top_level_pages,
     top_level_sessions
+) %>% unlist(
+    recursive = FALSE
 )
