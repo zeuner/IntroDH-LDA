@@ -68,10 +68,67 @@ top_level_sessions <- function (page) {
                 replacement = "\\1"
             ) %>% str_replace(
                 pattern = " - (.*) (.*) (.*) (.*) (.*) uur",
-                replacement = "%\\1%\\2%\\3%\\4%\\5"
+                replacement = "_\\1_\\2_\\3_\\4_\\5%"
+            ) %>% str_replace(
+                pattern = " - (.*) (.*) (.*) (.*), (plenaire vergadering|Verenigde Vergadering)$",
+                replacement = "_\\1_\\2_\\3_\\4_NA_\\5"
             ) %>% str_replace(
                 pattern = "^(.*) (.*) (.*) (.*) (.*) uur",
-                replacement = "unspecified%\\1%\\2%\\3%\\4%\\5"
+                replacement = "NA_\\1_\\2_\\3_\\4_\\5%"
+            ) %>% str_replace(
+                pattern = "%$",
+                replacement = "_NA"
+            ) %>% str_replace(
+                pattern = "%, ",
+                replacement = "_"
+            ) %>% str_replace(
+                pattern = "^(.*) (.*) (.*) (.*), (plenaire vergadering|Verenigde Vergadering)$",
+                replacement = "NA_\\1_\\2_\\3_\\4_NA_\\5"
+            ) %>% str_replace(
+                pattern = "_(Maan|Dins|Woens|Vrij|Zater)dag_",
+                replacement = "_%_"
+            ) %>% str_replace(
+                pattern = "_%_([0-9])_",
+                replacement = "_0\\1_"
+            ) %>% str_replace(
+                pattern = "_%_",
+                replacement = "_"
+            ) %>% str_replace(
+                pattern = "_januari_",
+                replacement = "_01_"
+            ) %>% str_replace(
+                pattern = "_februari_",
+                replacement = "_02_"
+            ) %>% str_replace(
+                pattern = "_maart_",
+                replacement = "_03_"
+            ) %>% str_replace(
+                pattern = "_april_",
+                replacement = "_04_"
+            ) %>% str_replace(
+                pattern = "_mei_",
+                replacement = "_05_"
+            ) %>% str_replace(
+                pattern = "_juni_",
+                replacement = "_06_"
+            ) %>% str_replace(
+                pattern = "_juli_",
+                replacement = "_07_"
+            ) %>% str_replace(
+                pattern = "_september_",
+                replacement = "_09_"
+            ) %>% str_replace(
+                pattern = "_oktober_",
+                replacement = "_10_"
+            ) %>% str_replace(
+                pattern = "_november_",
+                replacement = "_11_"
+            ) %>% str_replace(
+                pattern = "_december_",
+                replacement = "_12_"
+            ) %>% str_replace(
+                pattern = "^([0-9]*)e vergadering_",
+                replacement = "\\1_"
             )
             report_link_line <- Filter(
                 function (line) {
