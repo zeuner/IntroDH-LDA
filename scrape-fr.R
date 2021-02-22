@@ -195,13 +195,16 @@ frame <- data.frame(
     text = unlist(map(debates,function(row){row[4]}))
 )
 
+## need French locale to properly export the debate texts
+Sys.setlocale('LC_ALL','fr_FR.UTF-8')
+
 exported <- data.frame(
     id = paste(
         frame$date,
         frame$meeting,
         frame$item
     ) %>% str_replace_all(
-        pattern = "[^0-9a-z-]",
+        pattern = "[^0-9a-z]",
         replacement = "_"
     ),
     data = frame$text
