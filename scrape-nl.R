@@ -38,4 +38,62 @@ all_top_level_pages <- function (first) {
     list.prepend(all_top_level_pages(next_url), first)
 }
 
-all_top_level_pages(url_first_page)
+top_level_pages <- all_top_level_pages(url_first_page)
+
+top_level_sessions <- function (page) {
+    service <- url_service(page)
+    lines <- read_lines_html_caching(page)
+    sessions_start <- grep("<ul class=\"ladder\">", lines)
+    session_starts <- Filter(
+        function (start) {
+            sessions_start < start
+        },
+        grep("<li[^<>]*>", lines)
+    )
+    titles <- grep("<span class=\"strong\">.*</span>", lines)
+    report_links <- grep("<a href=\"[^\"]*verslag[^\"]*\"[^<>]*>", lines)
+    sessions <- map(
+        session_starts,
+        function (session_start) {
+            title_line <- Filter(
+                function (line) {
+                    session_start < line
+                },
+                titles
+            ) %>% head(n = 1)
+            title <- lines[
+                title_line
+            ] %>% str_replace(
+                pattern = ".*<span class=\"strong\">(.*)</span>.*",
+                replacement = "\\1"
+            )
+            report_link_line <- Filter(
+                function (line) {
+                    session_start < line
+                },
+                report_links
+            ) %>% head(n = 1)
+            report_link <- lines[
+                report_link_line
+            ] %>% str_replace(
+                pattern = ".*<a href=\"([^\"]*verslag[^\"]*)\"[^<>]*>.*",
+                replacement = "\\1"
+            ) %>% str_replace(
+                pattern = "^(/)",
+                replacement = paste0(service, "\\1")
+            )
+            c(title, report_link)
+        }
+    )
+    Filter(
+        function (session) {
+            1 < length(session)
+        },
+        sessions
+    )
+}
+
+map(
+    top_level_pages,
+    top_level_sessions
+)
