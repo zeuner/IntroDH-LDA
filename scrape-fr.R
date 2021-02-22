@@ -183,3 +183,30 @@ meeting_debates <- function (meeting_record) {
     )
     items
 }
+
+debates <- map(meetings, meeting_debates) %>% unlist(
+    recursive = FALSE
+)
+
+frame <- data.frame(
+    date = unlist(map(debates,function(row){row[1]})),
+    meeting = unlist(map(debates,function(row){row[2]})),
+    item = unlist(map(debates,function(row){row[3]})),
+    text = unlist(map(debates,function(row){row[4]}))
+)
+
+exported <- data.frame(
+    id = paste(
+        frame$date,
+        frame$meeting,
+        frame$item
+    ) %>% str_replace_all(
+        pattern = "[^0-9a-z-]",
+        replacement = "_"
+    ),
+    data = frame$text
+)
+
+json <- toJSON(exported)
+
+write(json, file="france.json")
