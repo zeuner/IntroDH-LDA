@@ -113,4 +113,73 @@ category_meetings <- function (category_url) {
     )
 }
 
-map(session_categories, category_meetings)
+meetings <- map(
+    session_categories,
+    category_meetings
+) %>% do.call(what = c)
+
+## returns a list of debates from the meeting
+## for each debate, this will be a vector, consisting of:
+## - date (YYYY-MM-DD format)
+## - meeting number within the day
+## - item number within the meeting
+## - text of the debate
+meeting_debates <- function (meeting_record) {
+    fragments <-read_lines_html_caching(
+        meeting_record[3]
+    ) %>% str_replace_all(
+        pattern = "%",
+        replacement = "%0"
+    ) %>% str_replace_all(
+        pattern = "(</[^<>]*>)",
+        replacement = "\\1%1"
+    ) %>% strsplit(
+        split = "%1"
+    ) %>% unlist(
+        recursive = FALSE
+    ) %>% str_replace_all(
+        pattern = "%0",
+        replacement = "%"
+    )
+    item_starts <- grep("<h5 class=\"numencad\">.*</h5>", fragments)
+    items <- item_starts %>% map(
+        function (item_start) {
+            item_end <- Filter(
+                function (subsequent) {
+                    item_start < subsequent
+                },
+                item_starts
+            ) %>% min
+            if (!is.finite(item_end)) {
+                scripts <- grep("<script[^<>]*>", fragments)
+                item_end <- Filter(
+                    function (subsequent) {
+                        item_start < subsequent
+                    },
+                    scripts
+                ) %>% min
+            }
+            item_number <- fragments[
+                item_start
+            ] %>% str_replace(
+                pattern = ".*<h5 class=\"numencad\">(.*)</h5>.*",
+                replacement = "\\1"
+            )
+            item_start <- item_start + 1
+            item_end <- item_end - 1
+            text <- fragments[
+                item_start : item_end
+            ] %>% str_replace_all(
+                "(<p[^<>]*>|<br />)",
+                "\n"
+            ) %>% str_replace_all(
+                "<[^<>]*>",
+                ""
+            ) %>% paste0(
+                collapse = "\n"
+            )
+            c(meeting_record[1], meeting_record[2], item_number, text)
+        }
+    )
+    items
+}
