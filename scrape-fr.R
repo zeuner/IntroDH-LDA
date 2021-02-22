@@ -159,6 +159,11 @@ meeting_debates <- function (meeting_record) {
                     scripts
                 ) %>% min
             }
+            ## in case of bad HTML, e.g. in
+            ## https://www.assemblee-nationale.fr/14/cri/2012-2013/20130245.asp
+            if (!is.finite(item_end)) {
+                item_end <- length(fragments)
+            }
             item_number <- fragments[
                 item_start
             ] %>% str_replace(
