@@ -177,6 +177,9 @@ meeting_debates <- function (meeting_record) {
                 ""
             ) %>% paste0(
                 collapse = "\n"
+            ) %>% str_replace_all(
+                "\n\n\n*",
+                "\n\n"
             )
             c(meeting_record[1], meeting_record[2], item_number, text)
         }
