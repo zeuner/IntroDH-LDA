@@ -163,9 +163,19 @@ top_level_sessions <- function (page) {
     )
 }
 
-map(
+sessions <- map(
     top_level_pages,
     top_level_sessions
 ) %>% unlist(
     recursive = FALSE
 )
+
+session_debates <- function (session) {
+    lines <- read_lines_html_caching(session[2])
+    lines[
+        grep("<h2><a id=\".*\"></a>", lines)
+    ] %>% str_replace(
+        pattern = "<h2><a id=\".*\"></a>",
+        replacement = ""
+    )
+}
