@@ -150,7 +150,14 @@ top_level_sessions <- function (page) {
     )
     Filter(
         function (session) {
-            1 < length(session)
+## for now, exclude PDF-based stenograms since they can be split into
+## different debate items less easily
+## TODO: implement PDF scraping
+            (
+                1 < length(session)
+            ) && (
+                0 == length(grep("[.]pdf", session[[2]]))
+            )
         },
         sessions
     )
