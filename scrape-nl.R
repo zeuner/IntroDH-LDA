@@ -170,12 +170,96 @@ sessions <- map(
     recursive = FALSE
 )
 
+## extracts a list of character vectors from a speech url,
+##  the vectors consisting of:
+## - title of the item
+## - ordinal number of the chamber meeting within the legislatory period
+## - day of month (DD format)
+## - month (MM format)
+## - year (YYYY format)
+## - time (HH:MM format)
+## - type of meeting
+## - ID of the item within the meeting
+## - debate text
 session_debates <- function (session) {
     lines <- read_lines_html_caching(session[2])
-    lines[
-        grep("<h2><a id=\".*\"></a>", lines)
-    ] %>% str_replace(
-        pattern = "<h2><a id=\".*\"></a>",
-        replacement = ""
+    item_starts <- grep("<h2><a id=\".*\"></a>", lines)
+    items <- map(
+        item_starts,
+        function (item_start) {
+            item_end <- Filter(
+                function (subsequent) {
+                    item_start < subsequent
+                },
+                item_starts
+            ) %>% min
+            if (0 == length(item_end)) {
+                item_end <- Filter(
+                    function (subsequent) {
+                        item_start < subsequent
+                    },
+                    grep("<script[^<>]*>", lines)
+                ) %>% min
+            }
+            head_line <- lines[
+                item_start
+            ]
+            item_id <- head_line %>% str_replace(
+                pattern = ".*<h2><a id=\"(.*)\"></a>.*",
+                replacement = "\\1"
+            )
+            title <- head_line %>% str_replace(
+                pattern = ".*<h2><a id=\".*\"></a>",
+                replacement = ""
+            )
+	    if (is.finite(item_end)) {
+                text <- lines[
+                    (item_start + 1) : (item_end - 1)
+                ] %>% str_replace_all(
+                    pattern = "(<p[^<>]*>|<br />)",
+                    replacement = "\n"
+                ) %>% str_replace_all(
+                    pattern = "<!--.*-->",
+                    replacement = ""
+                ) %>% paste0(
+                    collapse = "\n"
+                ) %>% str_replace_all(
+                    pattern = "<[^<>]*>",
+                    replacement = ""
+                ) %>% str_replace_all(
+                    pattern = "\n\n\n*",
+                    replacement = "\n\n"
+                )
+            } else {
+## these are expected to be trimmed below
+                text <- ""
+            }
+            unlist(
+                c(
+                    title,
+                    strsplit(
+                        session[1],
+                        "_"
+                    ),
+                    item_id,
+                    text
+                )
+            )
+        }
     )
+## trim closing and attachments
+## should we also trim the opening?
+    last_regular <- items %>% map(
+        function (item) {
+            item[1]
+        }
+    ) %>% grep(
+        pattern = "^(Sluiting|Bijlages)$",
+        invert = TRUE
+    ) %>% max
+    items[
+        1 : last_regular
+    ]
 }
+
+debates <- map(sessions, session_debates) %>% unlist(recursive = FALSE)
