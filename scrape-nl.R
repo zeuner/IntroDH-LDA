@@ -40,7 +40,7 @@ all_top_level_pages <- function (first) {
 
 top_level_pages <- all_top_level_pages(url_first_page)
 
-top_level_sessions <- function (page) {
+top_level_sessions <- function (page, want_pdf = 0) {
     service <- url_service(page)
     lines <- read_lines_html_caching(page)
     sessions_start <- grep("<ul class=\"ladder\">", lines)
@@ -156,7 +156,7 @@ top_level_sessions <- function (page) {
             (
                 1 < length(session)
             ) && (
-                0 == length(grep("[.]pdf", session[[2]]))
+                want_pdf == length(grep("[.]pdf", session[[2]]))
             )
         },
         sessions
