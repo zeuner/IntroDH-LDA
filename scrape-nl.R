@@ -263,3 +263,32 @@ session_debates <- function (session) {
 }
 
 debates <- map(sessions, session_debates) %>% unlist(recursive = FALSE)
+
+frame <- data.frame(
+    year = unlist(map(debates,function(row){row[5]})),
+    month = unlist(map(debates,function(row){row[4]})),
+    day = unlist(map(debates,function(row){row[3]})),
+    time = unlist(map(debates,function(row){row[6]})),
+    meeting = unlist(map(debates,function(row){row[2]})),
+    item = unlist(map(debates,function(row){row[8]})),
+    text = unlist(map(debates,function(row){row[9]}))
+)
+
+exported <- data.frame(
+    id = paste(
+        frame$year,
+        frame$month,
+        frame$day,
+        frame$time,
+        frame$meeting,
+        frame$item
+    ) %>% str_replace_all(
+        pattern = "[^0-9a-z]",
+        replacement = "_"
+    ),
+    data = frame$text
+)
+
+json <- toJSON(exported)
+
+write(json, file="netherlands.json")
