@@ -7,12 +7,4 @@ csvs/*
 results/*
 cached/*
 *.json
-austria.json
-belgium.json
-czechia.json
-spain.json
-hungary.json
-ireland.json
-italy.json
-poland.json
-hungary-dtm.rds
+*-dtm.rds
