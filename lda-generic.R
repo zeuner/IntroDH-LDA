@@ -16,13 +16,34 @@ cpus_lda <- parallel::detectCores()
 
 country_settings <- hash()
 
+country_settings[["belgium"]] <- list(
+    locale = "fr_BE",
+    language = "fr"
+)
+
+country_settings[["czechia"]] <- list(
+    locale = "cs_CZ",
+    language = "cs",
+    stopwords_source = "stopwords-iso"
+)
+
 country_settings[["hungary"]] <- list(
     locale = "hu_HU",
     language = "hu"
 )
 
+country_settings[["italy"]] <- list(
+    locale = "it_IT",
+    language = "it"
+)
+
 analyze_country <- function (country_name) {
     settings <- country_settings[[country_name]]
+    if (is.null(settings$stopwords_source)) {
+        stopwords_source <- "snowball"
+    } else {
+        stopwords_source <- settings$stopwords_source
+    }
     dtm_cache_file <- paste0(country_name, "-dtm.rds")
     if (file.exists(dtm_cache_file)) {
         dtm <- readRDS(dtm_cache_file)
@@ -36,11 +57,17 @@ analyze_country <- function (country_name) {
                 partial(tail, n = 1)
             ) %>% unlist
         }
+        message(paste("stopwords", settings$language, stopwords_source))
         dtm <- CreateDtm(
             doc_vec = frame$data,
             doc_names = frame$id,
             ngram_window = c(1, 1),
-            stopword_vec = c(stopwords::stopwords(settings$language)),
+            stopword_vec = c(
+                stopwords::stopwords(
+                    language = settings$language,
+                    source = stopwords_source
+                )
+            ),
             lower = TRUE,
             remove_punctuation = TRUE,
             remove_numbers = TRUE,
