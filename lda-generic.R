@@ -92,5 +92,5 @@ analyze_country <- function (country_name) {
         calc_r2 = TRUE,
         cpus = cpus_lda
     )
-    return c(dtm, model)
+    return (list(dtm = dtm, model = model))
 }
