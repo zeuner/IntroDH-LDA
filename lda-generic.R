@@ -10,6 +10,7 @@ library(hunspell)
 library(SnowballC)
 library(textmineR)
 library(hash)
+library(tidyverse)
 
 cpus_lda <- parallel::detectCores()
 
@@ -28,7 +29,12 @@ analyze_country <- function (country_name) {
     } else {
         frame <- fromJSON(read_file(paste0(country_name, ".json")))
         stemming_function <- function (x) {
-            unlist(hunspell_stem(x, settings$locale))
+            hunspell_stem(
+                x,
+                settings$locale
+            ) %>% map(
+                partial(tail, n = 1)
+            ) %>% unlist
         }
         dtm <- CreateDtm(
             doc_vec = frame$data,
