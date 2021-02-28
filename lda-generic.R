@@ -10,6 +10,8 @@ library(hunspell)
 library(SnowballC)
 library(textmineR)
 
+cpus_lda <- parallel::detectCores()
+
 dtm_cache_file <- "hungary-dtm.rds"
 
 if (file.exists(dtm_cache_file)) {
@@ -29,7 +31,7 @@ if (file.exists(dtm_cache_file)) {
         remove_numbers = TRUE,
         verbose = FALSE,
         stem_lemma_function = stemming_function,
-        cpus = parallel::detectCores()
+        cpus = cpus_lda
     )
 
     saveRDS(dtm, file = dtm_cache_file)
@@ -48,7 +50,7 @@ model <- FitLdaModel(
     calc_likelihood = TRUE,
     calc_coherence = TRUE,
     calc_r2 = TRUE,
-    cpus = parallel::detectCores()
+    cpus = cpus_lda
 )
 
 ## sample output of top terms for each topic
