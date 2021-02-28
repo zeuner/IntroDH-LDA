@@ -16,6 +16,11 @@ cpus_lda <- parallel::detectCores()
 
 country_settings <- hash()
 
+country_settings[["austria"]] <- list(
+    locale = "de_AT",
+    language = "de"
+)
+
 country_settings[["belgium"]] <- list(
     locale = "fr_BE",
     language = "fr"
@@ -25,6 +30,11 @@ country_settings[["czechia"]] <- list(
     locale = "cs_CZ",
     language = "cs",
     stopwords_source = "stopwords-iso"
+)
+
+country_settings[["france"]] <- list(
+    locale = "fr_FR",
+    language = "fr"
 )
 
 country_settings[["hungary"]] <- list(
@@ -40,6 +50,16 @@ country_settings[["ireland"]] <- list(
 country_settings[["italy"]] <- list(
     locale = "it_IT",
     language = "it"
+)
+
+country_settings[["netherlands"]] <- list(
+    locale = "nl_NL",
+    language = "nl"
+)
+
+country_settings[["poland"]] <- list(
+    locale = "pl_PL",
+    language = "pl"
 )
 
 country_settings[["spain"]] <- list(
