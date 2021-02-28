@@ -32,9 +32,19 @@ country_settings[["hungary"]] <- list(
     language = "hu"
 )
 
+country_settings[["ireland"]] <- list(
+    locale = "en_GB",
+    language = "en"
+)
+
 country_settings[["italy"]] <- list(
     locale = "it_IT",
     language = "it"
+)
+
+country_settings[["spain"]] <- list(
+    locale = "es_ES",
+    language = "es"
 )
 
 analyze_country <- function (country_name) {
@@ -57,7 +67,6 @@ analyze_country <- function (country_name) {
                 partial(tail, n = 1)
             ) %>% unlist
         }
-        message(paste("stopwords", settings$language, stopwords_source))
         dtm <- CreateDtm(
             doc_vec = frame$data,
             doc_names = frame$id,
