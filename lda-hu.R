@@ -7,7 +7,7 @@
 library(textmineR)
 source("lda-generic.R")
 
-model <- analyze_country("hungary")
+model <- analyze_country("hungary")[[2]]
 
 ## sample output of top terms for each topic
 model$top_terms <- GetTopTerms(phi = model$phi, M = 5)
