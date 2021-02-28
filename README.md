@@ -1,8 +1,38 @@
-% LDA Analysis of Hungarian parliamentary protocols (2014-2018 cycle)
+% LDA Analysis of some European parliamentary protocols
+
+- Belgium (time interval?)
+- Czechia (time interval?)
+- Austria (time interval?)
+- Spain (time interval?)
+- Hungary (2014-2018 cycle)
+- Ireland (time interval?)
+- Italy (time interval?)
+- Netherlands (time interval?)
+- France (time interval?)
+- Poland (time interval?)
 
 # What is included:
 
-- lda.R: the main script, which downloads the necessary data, processes it and generates the results
+- scrape-??.R scripts to get the protocols for the different countries
+- lda-??.R LDA analysis stub to extract a topic model from the protocols
+- scrape.R utility code to help scraping the protocols
+- lda-generic.R generic LDA topic modeling workflow for all countries
+
+# What is required:
+
+Please be sure to have the necessary spell checker modules for the
+different languages installed. On Debian-/Ubuntu-based operating systems,
+the following packages will be required to run the lda-??.R scripts:
+
+- hunspell-cs
+- hunspell-de-at
+- hunspell-en-gb
+- hunspell-es
+- hunspell-fr
+- hunspell-hu
+- hunspell-it
+- hunspell-nl
+- hunspell-pl
 
 # Already implemented
 
