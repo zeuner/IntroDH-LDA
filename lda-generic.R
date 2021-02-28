@@ -59,7 +59,8 @@ country_settings[["netherlands"]] <- list(
 
 country_settings[["poland"]] <- list(
     locale = "pl_PL",
-    language = "pl"
+    language = "pl",
+    stopwords_source = "stopwords-iso"
 )
 
 country_settings[["spain"]] <- list(
