@@ -1,3 +1,5 @@
+library(digest)
+
 options(HTTPUserAgent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
 
 read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
