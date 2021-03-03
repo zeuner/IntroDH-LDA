@@ -15,14 +15,6 @@ url_top_level <- "http://www.sejm.gov.pl/Sejm9.nsf/page.xsp/archiwum"
 
 current_legislatory_period_top_level <- "http://www.sejm.gov.pl/Sejm9.nsf/wypowiedzi.xsp"
 
-url_service <- function(url) {
-    str_replace(
-        url,
-        pattern = "^([^/:]*://[^/]*)(/.*|$)",
-        replacement = "\\1"
-    )
-}
-
 url_top_level_service <- url_service(
     url_top_level
 )
@@ -88,6 +80,11 @@ legislatory_period_top_levels <- archive_top_level[
     current_legislatory_period_top_level
 )
 
+## https://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
+unescape_html <- function(str) {
+    xml2::xml_text(xml2::read_html(paste0("<x>", str, "</x>")))
+}
+
 orka_next_level <- function (
     current_level,
     expand_pattern,
@@ -114,11 +111,7 @@ orka_next_level <- function (
             replacement = "\\1"
         )
     ) %>% map(
-        partial(
-            str_replace_all,
-            pattern = "&amp;",
-            replacement = "&"
-        )
+        unescape_html
     ) %>% map(
         partial(
             str_replace,
@@ -344,9 +337,8 @@ www_archive_date_url <- function (archive_url) {
     ] %>% str_replace(
         pattern = ".*href=\"([^\"]*)\".*",
         replacement = "\\1"
-    ) %>% str_replace_all(
-        pattern = "&amp;",
-        replacement = "&"
+    ) %>% map(
+        unescape_html
     ) %>% str_replace(
         pattern  ="^([^/]*)$",
         replacement = paste0(archive_path, "\\1")
@@ -383,11 +375,7 @@ www_archive_speech_url <- function (date_url) {
             replacement = "\\1"
         )
     ) %>% map(
-        partial(
-            str_replace_all,
-            pattern = "&amp;",
-            replacement = "&"
-        )
+        unescape_html
     ) %>% map(
         partial(
             str_replace,
