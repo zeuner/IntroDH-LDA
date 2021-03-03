@@ -16,21 +16,27 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Loading the website
 
-parliament_archive <-
-    read_lines_retrying("https://public.psp.cz/eknih/2013ps/tesnopis/index.htm")
+parliament_archives <- list(
+    list(read_lines_retrying("https://public.psp.cz/eknih/2010ps/tesnopis/index.htm"), 2010, 2013),
+    list(read_lines_retrying("https://public.psp.cz/eknih/2013ps/tesnopis/index.htm"), 2013, 2017),
+    list(read_lines_retrying("https://public.psp.cz/eknih/2017ps/tesnopis/index.htm"), 2017, 2021))
+
 
 ## -------------------------------------------------------------------
 ## Extracting the links for the pdf files
 
 Sys.setlocale("LC_ALL", "C")
 
-links <- grep("tz[0-9]{3}\\.pdf",parliament_archive, value = TRUE) %>%
+links <- lapply(parliament_archives, function(parliament_archive) {
+    grep("tz[0-9]{3}\\.pdf",parliament_archive[[1]], value = TRUE) %>%
     sapply(FUN=function(x) {
-        str_replace(x, ".*\"(tz[0-9]{3}\\.pdf)\".*", "\\1")}) %>%
+        str_replace(x, ".*\"(tz)([0-9]{3})\\.pdf\".*",
+                    sprintf("\\1\\2.pdf\tcz-%d-%d-\\2.pdf",
+                            parliament_archive[[2]], parliament_archive[[3]]))}) %>%
     sapply(FUN=function(x) {
-        paste(paste("https://public.psp.cz/eknih/2013ps/tesnopis/", x, sep=""),
-              paste("cz-", x, sep=""), sep="\t")}) %>%
-    str_split("\t")
+        paste(sprintf("https://public.psp.cz/eknih/%dps/tesnopis/",parliament_archive[[2]]), x, sep="") %>%            str_split("\t") }) }) %>%
+    unlist(recursive=FALSE)
+
 
 
 ## -------------------------------------------------------------------
