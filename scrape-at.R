@@ -73,12 +73,13 @@ unhyphenate <- function (data) {
         sapply(trimws)}
 
 remove_header <- function(page) {
-    page <- filter(page, y > 37)
+    page <- filter(page, y > 40)
     if (length(page$text) == 0) {
         NULL
     } else page }
 
 trim_content <- function(pages) {
+    start <- 1
     for (i in 1:length(pages)) {
         p <- pages[[i]]
         if (paste(p$text[1], p$text[2], p$text[3]) == "Beginn der Sitzung:") {
