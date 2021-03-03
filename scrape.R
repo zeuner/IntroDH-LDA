@@ -1,8 +1,10 @@
+library(digest)
+
 options(HTTPUserAgent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
 
 read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
     result <- NA
-    while (is.na(result) && 0 < attempts) {
+    while ((0 == length(result) || is.na(result)) && 0 < attempts) {
         attempts <- attempts - 1
         result <- tryCatch(
             {
@@ -17,7 +19,7 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
             }
         )
     }
-    if (is.na(result)) {
+    if (0 == length(result) || is.na(result)) {
         stop(paste("could not get URL ", url))
     }
     return(result)
@@ -40,13 +42,25 @@ read_lines_html_caching <- function(url) {
     if (file.exists(cache_file)) {
         return (readLines(cache_file))
     }
-    retrieved <- read_lines_retrying(url)
+    retrieval_success <- FALSE
+    attempts <- 0
+    while (!retrieval_success && attempts < 5) {
+        attempts <- attempts + 1
+        retrieved <- read_lines_retrying(url)
+        http_error <- length(
+            grep(">Error 500<", retrieved)
+        )
+        retrieval_success <- 0 == http_error
+        if (!retrieval_success) {
+            Sys.sleep(5)
+        }
+    }
     html_completed <- length(
         grep("</html>", retrieved)
     ) + length(
         grep("</HTML>", retrieved)
     )
-    if (1 == html_completed) {
+    if (retrieval_success && (1 == html_completed)) {
         writeLines(
             retrieved,
             cache_file
