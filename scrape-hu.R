@@ -19,23 +19,33 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Loading the parliamentary archive
 
-parliament_archive <-
-    read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018")
+parliament_archives <- list(
+    read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018"),
+    read_lines_retrying("https://www.parlament.hu/web/guest/orszaggyulesi-naplo"))
 
 
 ## -------------------------------------------------------------------
 ## Extracting the links for the pdf files
 
-links <- parliament_archive[grep("/documents/10181/.*szám",parliament_archive)] %>%
+links <- lapply(parliament_archives, function (parliament_archive) {
+    archive <- parliament_archive %>% paste(., collapse="\n") %>%
+        str_replace_all(pattern="<td", replacement="\n<td") %>%
+        str_split(pattern="\n") %>% unlist
+    archive[grep("/documents/10181/.*szám",archive)] %>%
     map(partial(str_replace,
-                pattern=".*(/documents/[^\"]*)\".*>.*(\\d{4}.+\\d{2}.+\\d{2}).*",
-                replacement="\\1\thu-\\2.pdf")) %>% # Extracting relative URL and date
-    map(partial(str_replace,
-                pattern=" ",
-                replacement="")) %>% # Correcting malformed dates
-    map(function (x) sprintf("https://www.parlament.hu%s", x)) %>%
+                pattern=".*(/documents/[^\"]*)\".*",
+                replacement="\\1")) %>% # Extracting relative URL and date
+    map(function (x) sprintf("https://www.parlament.hu%s", x)) %>% rev}) %>%
     # Putting the URL together
-    str_split(.,"\t")
+    rev
+
+periods <- c("2014-2018", "2018-2022")
+
+for (i in 1:2) {
+    for (j in 1:length(links[[i]])) {
+        links[[i]][[j]] <- c(links[[i]][[j]], sprintf("hu-%s-%03d.pdf", periods[i], j)) }}
+
+links <- unlist(links , recursive =FALSE)
 
 ## links: a list of character[2] vectors
 ## [0]: URL
@@ -82,7 +92,7 @@ pdf_to_txt <- function(infile,outfile,nth,total) {
         pdf_data(infile) %>%
             ## Apparently all needed pages' content starts on y coordinate 67
             lapply(function (x) {
-                if (length(x$y>0) && x$y[1] == 67) x
+                if (length(x$y>0) && x$y[1] > 65 && x$y[1] < 70) x
                 else NULL}) %>%
             .[sapply(.,Negate(is.null))] %>%
             ## Removing page headers
