@@ -122,5 +122,17 @@ analyze_country <- function (country_name) {
         calc_r2 = TRUE,
         cpus = cpus_lda
     )
+    model$prevalence <- colSums(model$theta) / sum(model$theta) * 100
+    model$labels <- LabelTopics(assignments = model$theta > 0.05, 
+                            dtm = dtm,
+                            M = 1)
+    model$summary <- data.frame(topic = rownames(model$phi),
+                            label = model$labels,
+                            coherence = round(model$coherence, 3),
+                            prevalence = round(model$prevalence,3),
+                            top_terms = apply(model$top_terms, 2, function(x){
+                              paste(x, collapse = ", ")
+                            }),
+                            stringsAsFactors = FALSE)
     return (list(dtm = dtm, model = model))
 }

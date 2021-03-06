@@ -9,7 +9,6 @@ source("lda-generic.R")
 
 model <- analyze_country("hungary")$model
 
-## sample output of top terms for each topic
-model$top_terms <- GetTopTerms(phi = model$phi, M = 5)
+write_rds(model , file="hungary-lda.Rds")
 
-head(t(model$top_terms))
+write_csv(model$summary, "hungary-summary.csv")
