@@ -122,6 +122,7 @@ analyze_country <- function (country_name) {
         calc_r2 = TRUE,
         cpus = cpus_lda
     )
+    model$top_terms <- GetTopTerms(phi = model$phi, M = 100)
     model$prevalence <- colSums(model$theta) / sum(model$theta) * 100
     model$labels <- LabelTopics(assignments = model$theta > 0.05, 
                             dtm = dtm,
