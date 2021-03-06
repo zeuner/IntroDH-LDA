@@ -102,7 +102,7 @@ analyze_country <- function (country_name) {
             remove_punctuation = TRUE,
             remove_numbers = TRUE,
             verbose = FALSE,
-            stem_lemma_function = stemming_function,
+            ## stem_lemma_function = stemming_function,
             cpus = cpus_lda
         )
         saveRDS(dtm, file = dtm_cache_file)
@@ -111,7 +111,7 @@ analyze_country <- function (country_name) {
     set.seed(12833)
     model <- FitLdaModel(
         dtm = dtm,
-        k = 20,
+        k = 50,
         iterations = 500,
         burnin = 180,
         alpha = 0.1,
