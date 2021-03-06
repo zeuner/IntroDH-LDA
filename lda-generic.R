@@ -9,6 +9,7 @@ library(jsonlite)
 library(hunspell)
 library(SnowballC)
 library(textmineR)
+library(tidyverse)
 
 cpus_lda <- parallel::detectCores()
 
@@ -19,7 +20,10 @@ if (file.exists(dtm_cache_file)) {
 } else {
     frame <- fromJSON(read_file("hungary.json"))
 
-    stemming_function <- function (x) unlist(hunspell_stem(x,"hu_HU"))
+    stemming_function <- function (x) {
+        hunspell_stem(x, "hu_HU") %>% map(partial(tail, n = 1)) %>% unlist
+    }
+
 
     dtm <- CreateDtm(
         doc_vec = frame$data,

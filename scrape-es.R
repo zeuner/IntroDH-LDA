@@ -18,13 +18,22 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Loading the website
 
-links <- lapply(1:101,
+period_sessions <- list(c(10, 178),
+                        c(11, 8),
+                        c(12, 101),
+                        c(13, 3),
+                        c(14, 41))
+                     
+
+links <- lapply(period_sessions, function (period) {
+    lapply(1:period[2],
                 function (x) {
                     dl_link <- 
-                        sprintf("https://www.senado.es/legis12/publicaciones/pdf/senado/ds/DS_P_12_%d.PDF",
-                                x)
-                    c(dl_link, sprintf("es-%03d.pdf", x)) })
+                        sprintf("https://www.senado.es/legis%d/publicaciones/pdf/senado/ds/DS_P_%d_%d.PDF",
+                                period[1], period[1], x)
+                    c(dl_link, sprintf("es-%d-%03d.pdf", period[1],  x)) })})
 
+links <- unlist(links, recursive=FALSE)
 
 ## Downloading
 

@@ -16,22 +16,28 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Loading the website
 
+legislatures <- 1:6
+
 Sys.setlocale("LC_ALL", "C")
-parliament_archive <-
-    read_lines_retrying("https://www.senate.be/www/?MIval=/publications/ListPub&LANG=fr&COLL=H&LEG=6&START=1&END=48")
+parliament_archive <- lapply(legislatures, function (legislature) {
+    read_lines_retrying(sprintf("https://www.senate.be/www/?MIval=/publications/ListPub&LANG=fr&COLL=H&LEG=%d&START=1&END=500", legislature))})
 
 ## -------------------------------------------------------------------
 ## Extracting the links for the pdf files
 
-links <- grep("\"/www/webdriver[^\"]+Obj=application/pdf[^\"]+[0-9]+\"",
-              parliament_archive, value=TRUE) %>%
+links <- lapply(parliament_archive, function(archive ) {
+    grep("\"/www/webdriver[^\"]+Obj=application/pdf[^\"]+[0-9]+\"",
+              archive, value=TRUE) %>%
     lapply(FUN=function(x) {
         str_replace(x, ".*\"(/www/webdriver[^\"]+Obj=application/pdf[^\"]+[0-9]+)\".*",
-                    "https://www.senate.be\\1")})
+                    "https://www.senate.be\\1")}) })
 
 for (i in 1:length(links)) {
-    links[[i]] <- c(links[[i]], sprintf("be-%02d.pdf", i))
+    for (j in 1:length(links[[i]])) {
+    links[[i]][[j]] <- c(links[[i]][[j]], sprintf("be-%d-%02d.pdf", i, j)) }
 }
+
+links <- unlist(links, recursive=FALSE)
 
 ## Downloading
 
