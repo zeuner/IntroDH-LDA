@@ -1,8 +1,10 @@
+library(digest)
+
 options(HTTPUserAgent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
 
 read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
     result <- NA
-    while (is.na(result) && 0 < attempts) {
+    while ((0 == length(result) || is.na(result)) && 0 < attempts) {
         attempts <- attempts - 1
         result <- tryCatch(
             {
@@ -17,10 +19,54 @@ read_lines_retrying <- function(url, attempts = 5, throttle = 5) {
             }
         )
     }
-    if (is.na(result)) {
+    if (0 == length(result) || is.na(result)) {
         stop(paste("could not get URL ", url))
     }
     return(result)
+}
+
+## read_lines_html_caching implements caching for HTML content that is expected
+## to be immutable on the server side. Deleting the contents of the
+## cache_directory should not change the output of scripts at all, but might
+## cost time through refetching the cached content.
+cache_directory <- file.path(getwd(), "cached")
+
+if (! dir.exists(cache_directory)){
+    dir.create(cache_directory)}
+
+read_lines_html_caching <- function(url) {
+    cache_file <- file.path(
+        cache_directory,
+        paste0(digest(url, algo = "sha256"), ".html")
+    )
+    if (file.exists(cache_file)) {
+        return (readLines(cache_file))
+    }
+    retrieval_success <- FALSE
+    attempts <- 0
+    while (!retrieval_success && attempts < 5) {
+        attempts <- attempts + 1
+        retrieved <- read_lines_retrying(url)
+        http_error <- length(
+            grep(">Error 500<", retrieved)
+        )
+        retrieval_success <- 0 == http_error
+        if (!retrieval_success) {
+            Sys.sleep(5)
+        }
+    }
+    html_completed <- length(
+        grep("</html>", retrieved)
+    ) + length(
+        grep("</HTML>", retrieved)
+    )
+    if (retrieval_success && (1 == html_completed)) {
+        writeLines(
+            retrieved,
+            cache_file
+        )
+    }
+    return (retrieved)
 }
 
 pdf_directory <- file.path(getwd(), "pdfs")
@@ -66,6 +112,22 @@ download_pdfs <- function(nth, links) {
     total <- length(links)
     return(download_file(URL,outfile,nth,total))}
 
+
+url_service <- function(url) {
+    str_replace(
+        url,
+        pattern = "^([^/:]*://[^/]*)(/.*|$)",
+        replacement = "\\1"
+    )
+}
+
+url_directory <- function(url) {
+    str_replace(
+        url,
+        pattern = "[^/]*$",
+        replacement = ""
+    )
+}
 
 result_directory <- file.path(getwd(), "results")
 

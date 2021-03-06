@@ -16,23 +16,34 @@ source("scrape.R")
 ## -------------------------------------------------------------------
 ## Fetching pdf urls
 
-websites <- sapply(1:89,
-    function(x){
-      sprintf("https://www.parlament.gv.at/PAKT/VHG/XXVI/NRSITZ/NRSITZ_%s/",
-              str_pad(x, width=5, pad="0"))})
+legislature_sessions <- list(c("XXI", 117),
+                             c("XXII", 163),
+                             c("XXIII", 75),
+                             c("XXIV", 219),
+                             c("XXV", 199),
+                             c("XXVI", 89))
 
-links <- lapply(websites, read_lines_retrying) %>%
+websites <- lapply(legislature_sessions, function(period) {
+    sapply(1:period[2],
+    function(session){
+      sprintf("https://www.parlament.gv.at/PAKT/VHG/%s/NRSITZ/NRSITZ_%s/", period[1],
+              str_pad(session, width=5, pad="0"))})})
+
+links <- lapply(websites, function(period) {
+    lapply(period, read_lines_retrying) %>%
     sapply(function(x) {
-        grep("/PAKT/VHG/XXVI/NRSITZ/NRSITZ_[0-9]+/fname_[0-9]+.pdf",
+        grep("/PAKT/VHG/.*/NRSITZ/NRSITZ_[0-9]+/fname_[0-9]+.pdf",
              x, value=TRUE) %>%
-            str_replace(pattern=".*(/PAKT/VHG/XXVI/NRSITZ/NRSITZ_[0-9]+/fname_[0-9]+.pdf).*",
+            str_replace(pattern=".*(/PAKT/VHG/.*/NRSITZ/NRSITZ_[0-9]+/fname_[0-9]+.pdf).*",
                         replacement="https://www.parlament.gv.at\\1")}) %>%
-    as.list
+    as.list })
 
 for (i in 1:length(links)){
-    links[[i]] <- c(links[[i]], sprintf("at-%02d.pdf", i))
+    for (j in 1:length(links[[i]])) {
+        links[[i]][[j]] <- c(links[[i]][[j]], sprintf("at-%s-%02d.pdf",legislature_sessions[[i]][1], j)) }
 }
 
+links <- unlist(links, recursive = FALSE)
 
 download_results <-
     lapply(1:length(links),
@@ -62,12 +73,13 @@ unhyphenate <- function (data) {
         sapply(trimws)}
 
 remove_header <- function(page) {
-    page <- filter(page, y > 37)
+    page <- filter(page, y > 40)
     if (length(page$text) == 0) {
         NULL
     } else page }
 
 trim_content <- function(pages) {
+    start <- 1
     for (i in 1:length(pages)) {
         p <- pages[[i]]
         if (paste(p$text[1], p$text[2], p$text[3]) == "Beginn der Sitzung:") {
