@@ -4,6 +4,12 @@
 
 - lda.R: the main script, which downloads the necessary data, processes it and generates the results
 
+The following locales have to be installed:
+
+- cs_CZ.UTF-8
+- fr_BE.UTF-8
+- fr_FR.UTF-8
+
 # Already implemented
 
 - downloading the necessary data

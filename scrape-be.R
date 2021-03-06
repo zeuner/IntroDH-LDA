@@ -95,6 +95,9 @@ trim_content <- function (pages) {
             break }}
     pages[start:end] }
 
+## need Belgian locale to properly export the debate texts
+Sys.setlocale('LC_ALL','fr_BE.UTF-8')
+
 pdf_to_txt <- function(infile, outfile, nth, total) {
     if (! file.exists(outfile)){
         pdf_data(infile) %>%
