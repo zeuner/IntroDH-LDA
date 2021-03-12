@@ -88,8 +88,8 @@ unhyphenate <- function (data) {
 
 
 pdf_to_txt <- function(infile,outfile,nth,total) {
-    if (! file.exists(outfile)){
-        pdf_data(infile) %>%
+##     if (! file.exists(outfile)){
+    txt_output <- pdf_data(infile) %>%
             ## Apparently all needed pages' content starts on y coordinate 67
             lapply(function (x) {
                 if (length(x$y>0) && x$y[1] > 65 && x$y[1] < 70) x
@@ -103,10 +103,20 @@ pdf_to_txt <- function(infile,outfile,nth,total) {
             paste(collapse=" ") %>%
             unhyphenate %>%
             trimws %>%
-            writeLines (outfile)
-        return(sprintf("[%3d/%3d] Converted %s -> %s",
-                       nth,total,infile,outfile))}
-    else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
+            str_split(" ") %>%
+            unlist %>%
+            split(., ceiling(seq_along(.) / 1000))
+
+    lapply(1:length(txt_output), function(x) {
+            write_file(x = paste(txt_output[[x]], collapse=" "),
+                       file = str_replace(outfile, "\\.txt",
+                                          sprintf("-%03d.txt", x))
+                       )
+            })
+    return(sprintf("[%3d/%3d] Converted %s -> %s",
+                   nth,total,infile,outfile))
+}
+    ## else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
 
 convert_pdf <- function(nth,pdfs) {
     infile <- pdfs[nth]
