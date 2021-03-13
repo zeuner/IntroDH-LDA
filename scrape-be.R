@@ -71,7 +71,7 @@ unhyphenate <- function (data) {
         sapply(trimws)}
 
 remove_header <- function (page) {
-    header_pos <- 41
+    header_pos <- 50
     x <- filter(page, y > header_pos)
     if (length(x$text) == 0) {
         NULL
@@ -79,22 +79,25 @@ remove_header <- function (page) {
 
 left_side <- function (page) {
     min_pos <- 300
-    filter(page, x > min_pos)}
+    filter(page, x < min_pos)}
 
 right_side <- function (page) {
     min_pos <- 300
-    filter(page, x < min_pos)}
+    filter(page, x > min_pos)}
 
 trim_content <- function (pages) {
     start <- 1
     end <- length(pages)
     for (i in 1:length(pages)) {
-        first30words <- paste(pages[[i]]$text[1:30], collapse=" ")
-        if (grepl("\\(La séance est ouverte à", first30words)) {
+        first40words <- paste(pages[[i]]$text[1:40], collapse=" ")
+        if (grepl("\\La séance est ouverte", first40words) ||
+            grepl("\\De vergadering wordt geopend", first40words)) {
             start <- i
             break }}
-    for (i in start:length(pages)) {
-        if (grepl("\\(La séance est levée à", paste(pages[[i]]$text, collapse=" "))){
+    for (i in end:start) {
+        page <- paste(pages[[i]]$text, collapse=" ")
+        if (grepl("\\La séance est levée à", page) ||
+            grepl("\\De vergadering wordt gesloten", page)){
             end <- i
             break }}
     pages[start:end] }
