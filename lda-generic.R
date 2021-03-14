@@ -111,7 +111,7 @@ analyze_country <- function (country_name) {
     set.seed(12833)
     model <- FitLdaModel(
         dtm = dtm,
-        k = 50,
+        k = 100,
         iterations = 500,
         burnin = 180,
         alpha = 0.1,

@@ -89,8 +89,8 @@ trim_content <- function(pages) {
     pages[start:length(pages)]}
 
 pdf_to_txt <- function(infile, outfile, nth, total) {
-    if (! file.exists(outfile)){
-        pdf_data(infile) %>%
+#    if (! file.exists(outfile)){
+        txt_output <- pdf_data(infile) %>%
             lapply(remove_header) %>%
             .[sapply(.,Negate(is.null))] %>% # removing empty pages
             trim_content %>%
@@ -99,10 +99,19 @@ pdf_to_txt <- function(infile, outfile, nth, total) {
             paste(collapse=" ") %>%
             unhyphenate %>%
             trimws %>%
-            writeLines(outfile)
+            str_split(" ") %>%
+            unlist %>%
+            split(., ceiling(seq_along(.) / 1000))
+
+        lapply(1:length(txt_output), function(x) {
+            write_file(x = paste(txt_output[[x]], collapse=" "),
+                       file = str_replace(outfile, "\\.txt",
+                                          sprintf("-%03d.txt", x))
+                       )
+        })
         return(sprintf("[%3d/%3d] Converted %s -> %s",
                        nth,total,infile,outfile))}
-    else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
+    ## else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
 
 convert_pdf <- function(nth,pdfs) {
     infile <- pdfs[nth]

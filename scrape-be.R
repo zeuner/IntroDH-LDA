@@ -71,53 +71,73 @@ unhyphenate <- function (data) {
         sapply(trimws)}
 
 remove_header <- function (page) {
-    header_pos <- 41
+    header_pos <- 50
     x <- filter(page, y > header_pos)
     if (length(x$text) == 0) {
         NULL
     } else x }
 
-only_french <- function (page) {
-    french_min_pos <- 300
-    filter(page, x > french_min_pos)}
+left_side <- function (page) {
+    min_pos <- 300
+    filter(page, x < min_pos)}
+
+right_side <- function (page) {
+    min_pos <- 300
+    filter(page, x > min_pos)}
 
 trim_content <- function (pages) {
     start <- 1
     end <- length(pages)
     for (i in 1:length(pages)) {
-        first30words <- paste(pages[[i]]$text[1:30], collapse=" ")
-        if (grepl("\\(La séance est ouverte à", first30words)) {
+        first40words <- paste(pages[[i]]$text[1:40], collapse=" ")
+        if (grepl("\\La séance est ouverte", first40words) ||
+            grepl("\\De vergadering wordt geopend", first40words)) {
             start <- i
             break }}
-    for (i in start:length(pages)) {
-        if (grepl("\\(La séance est levée à", paste(pages[[i]]$text, collapse=" "))){
+    for (i in end:start) {
+        page <- paste(pages[[i]]$text, collapse=" ")
+        if (grepl("\\La séance est levée à", page) ||
+            grepl("\\De vergadering wordt gesloten", page)){
             end <- i
             break }}
     pages[start:end] }
 
-pdf_to_txt <- function(infile, outfile, nth, total) {
-    if (! file.exists(outfile)){
-        pdf_data(infile) %>%
-            lapply(remove_header) %>% 
-            .[sapply(.,Negate(is.null))] %>% # removing empty pages
-            lapply(only_french) %>%
-            trim_content %>%
-            lapply(insert_newlines) %>%
-            unlist %>%
-            paste(collapse=" ") %>%
-            unhyphenate %>%
-            trimws %>%
-            writeLines(outfile)
+pdf_to_txt <- function(infile, outfile, nth, total, side) {
+    if (side == "right") {
+        which_side <- right_side
+    } else {
+        which_side <- left_side
+    }
+    txt_output <- pdf_data(infile) %>%
+        lapply(remove_header) %>% 
+        .[sapply(.,Negate(is.null))] %>% # removing empty pages
+        lapply(which_side) %>%
+        trim_content %>%
+        lapply(insert_newlines) %>%
+        unlist %>%
+        paste(collapse=" ") %>%
+        unhyphenate %>%
+        trimws %>%
+        str_split(" ") %>%
+        unlist %>%
+        split(., ceiling(seq_along(.) / 1000))
+
+        lapply(1:length(txt_output), function(x) {
+            write_file(x = paste(txt_output[[x]], collapse=" "),
+                       file = str_replace(outfile, "\\.txt",
+                                          sprintf("-%s-%03d.txt",side, x))
+                       )
+        })
         return(sprintf("[%3d/%3d] Converted %s -> %s",
                        nth,total,infile,outfile))}
-    else { return(sprintf("[%3d/%3d] %s already present.",nth,total,outfile))}}
 
 
 convert_pdf <- function(nth,pdfs) {
     infile <- pdfs[nth]
     outfile <- str_replace_all(infile,"pdf","txt")
     total <- length(pdfs)
-    return(pdf_to_txt(infile,outfile,nth,total))
+    pdf_to_txt(infile, outfile, nth, total, "left")
+    return(pdf_to_txt(infile,outfile,nth,total, "right"))
     }
 
 pdfs <- Sys.glob(file.path(pdf_directory, "be-*.pdf"))
@@ -131,7 +151,22 @@ convert_results <-
 
 writeLines(unlist(convert_results), file.path(result_directory, "be-convert_results.txt"))
 
-id <- Sys.glob(file.path(txt_directory, "be-*.txt"))
+## 1. period: French left, Dutch right
+## 2. period: French right, Dutch left
+## 3. period: French left, Dutch right
+## 4. period: French right, Dutch left
+## 5. period: French left, Dutch right
+## 6. period: French right, Dutch left
+
+## First period is more problematic due to its sentence-by-sentence
+## translation
+
+id <- c(#Sys.glob(file.path(txt_directory, "be-1-*-left*.txt")),
+        Sys.glob(file.path(txt_directory, "be-2-*-right*.txt")),
+        Sys.glob(file.path(txt_directory, "be-3-*-left*.txt")),
+        Sys.glob(file.path(txt_directory, "be-4-*-right*.txt")),
+        Sys.glob(file.path(txt_directory, "be-5-*-left*.txt")),
+        Sys.glob(file.path(txt_directory, "be-6-*-right*.txt")))
 
 data <- sapply(id, read_file)
 
