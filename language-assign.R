@@ -1,3 +1,10 @@
+## Description: Example script for splitting documents into parts based on
+##  word counts, and detecting the language by comparison with stop word files
+## Author: Isidor Zeuner
+## dh2021@quidecco.de
+## For license see: https://mit-license.org
+## -------------------------------------------------------------------
+
 library(tidyverse)
 library(pracma)
 library(koRpus)
@@ -20,6 +27,7 @@ words <- map(
     }
 )
 
+## for each line, the number of words up to that line
 cumulated_words <- cumsum(words)
 
 split_directory <- file.path(getwd(), "split")
@@ -27,6 +35,7 @@ split_directory <- file.path(getwd(), "split")
 if (! dir.exists(split_directory)){
     dir.create(split_directory)}
 
+## split into parts of about `split_at` words, but only at line end
 (
     1 : ceil(cumulated_words[[length(cumulated_words)]] / split_at)
 ) %>% map(
@@ -47,11 +56,15 @@ if (! dir.exists(split_directory)){
     }
 )
 
+## compute what fraction of the `words` are in the stopword list
+##  of the `language`
 language_match <- function (words, language) {
     wordlist <- stopwords::stopwords(language, source = "stopwords-iso")
     length(which(words %in% wordlist)) / length(words)
 }
 
+## compute which of the `languages` has the highest fraction of the `words`
+##  in its stopword list
 language_best_match <- function (words, languages) {
     languages[[
         which.max(map(languages, partial(language_match, words = words)))
