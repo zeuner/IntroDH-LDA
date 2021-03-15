@@ -68,34 +68,47 @@ country_settings[["spain"]] <- list(
     language = "es"
 )
 
-analyze_country <- function (country_name) {
+country_stopwords <- function (country_name) {
     settings <- country_settings[[country_name]]
     if (is.null(settings$stopwords_source)) {
         stopwords_source <- "snowball"
     } else {
         stopwords_source <- settings$stopwords_source
     }
+    stopwords::stopwords(
+        language = settings$language,
+        source = stopwords_source
+    )
+}
+
+country_stemmer <- function (country_name) {
+    settings <- country_settings[[country_name]]
+    function (x) {
+        hunspell_stem(
+            x,
+            settings$locale
+        ) %>% map(
+            partial(tail, n = 1)
+        ) %>% unlist
+    }
+}
+
+analyze_country <- function (country_name) {
     dtm_cache_file <- paste0(country_name, "-dtm.rds")
     if (file.exists(dtm_cache_file)) {
         dtm <- readRDS(dtm_cache_file)
     } else {
         frame <- fromJSON(read_file(paste0(country_name, ".json")))
-        stemming_function <- function (x) {
-            hunspell_stem(
-                x,
-                settings$locale
-            ) %>% map(
-                partial(tail, n = 1)
-            ) %>% unlist
-        }
+        stemming_function <- country_stemmer(
+            country_name
+        )
         dtm <- CreateDtm(
             doc_vec = frame$data,
             doc_names = frame$id,
             ngram_window = c(1, 1),
             stopword_vec = c(
-                stopwords::stopwords(
-                    language = settings$language,
-                    source = stopwords_source
+                country_stopwords(
+                    country_name
                 )
             ),
             lower = TRUE,
