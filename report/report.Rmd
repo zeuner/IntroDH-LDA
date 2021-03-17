@@ -1,0 +1,151 @@
+---
+output:
+  pdf_document:
+    highlight: tango
+    number_sections: true
+documentclass: scrreprt
+fontsize: 12pt
+---
+```{=latex}
+\begin{titlepage}
+\centering
+\vfill{}
+\input{uni_logo.pdf_tex} \par
+\vspace{3cm}
+{\bfseries\huge Analyzing Transnational Relationships in Parliament Debates \par}
+\vspace{1cm}
+{\large Agoston Volcz, Jonathan Weinmann, Isidor Zeuner \par
+March 14. 2021}
+
+\vfill
+Fakultät für Mathematik und Informatik \\
+Seminar: 10-207-0001 Einführung in die Digital Humanities \\
+Lecturer: Thomas Köntges, Ph.D. \\
+Semester: WS 2020/2021
+
+
+\end{titlepage}
+\setcounter{page}{1}
+\tableofcontents
+```
+
+Abstract
+
+# Introduction
+- general idea
+- summary of what the reader should expect
+
+# Data Acquisition
+- EU parliaments
+- languages that we speak, also languages which we don't
+
+## Deciding on sources
+
+- Austria:
+  Legislation periods:
+  - XXI: 29.10.1999--19.12.2002
+  - XXII: 20.12.2002--29.10.2006
+  - XXIII: 30.10.2006--27.10.2008
+  - XXIV: 28.10.2008--28.10.2013
+  - XXV: 29.10.2013--08.11.2017
+  - XXVI: 09.11.2017--22.10.2019
+
+  862 PDF documents / sessions, 51,722,689 total word count after removing table of contents etc.
+  
+- Belgium:
+  Legislation periods:
+  - 1995--1999
+  - 1999--2003
+  - 2003--2007
+  - 2007--2010
+  - 2010--2014
+  - 2014--2019
+
+  1,097 PDF documents / sessions, 43,741,136 total word count after removing table of contents etc.
+  
+- Czech Republic:
+  Legislation periods:
+  - 2010--2013
+  - 2013--2017
+  - 2017--2021*
+
+  186 PDF documents / sessions, 29,522,033 total word count after removing table of contents etc.
+  
+- France
+- Hungary:
+  Legislation periods:
+  - 2014--2018
+  - 2018--2021*
+  
+  451 PDF documents / sessions, 25,297,392 total word count after removing table of contents etc.
+  
+- Ireland:
+  Dáil debates from the 32nd Dáil, 2016--2020 (last session in December 2019)
+
+  394 PDF documents / sessions, 30,169,798 total word count after removing table of contents etc.
+  
+- Italy:
+  Legislature period:
+  - XVII: 15.03.2013--22.03.2018
+
+  923 PDF documents / sessions, 43,483,753 total word count after removing table of contents etc.
+- The Netherlands
+- Poland
+- Spain:
+  Legislature periods:
+  - X: 13.12.2011--27.10.2015
+  - XI: 13.01.2016--03.05.2016
+  - XII: 19.07.2016--05.03.2019
+  - XIII: 21.05.2019--24.09.2019
+  - XIV: 03.12.2019--2021*
+
+  331 PDF documents / sessions, 19,491,066 total word count after removing table of contents etc.
+
+## Downloading the data
+
+- we wrote scraper scripts
+- There were two kinds of archives: PDF and HTML. Some of the archives which offer PDF documents to download didn't have a consistent URL naming scheme for the documents, which had us extract the urls from their websites.
+- How did we scrape data which were in HTML documents?
+
+### Converting the documents to plain text
+
+- How did we convert HTML documents to plain text?
+- PDF documents were converted in each scraper script. We had to analyze the page layout of each country's protocols. Following steps were necessary to produce usable data: removing page headers and footers, removing empty pages, removing title page, table of contents etc., unhypthenating the text, splitting the documents to smaller chunks of maximum 1000 words size (here a reference to the paper which explained why it's important to do so), systematic document naming which contains information about country, legislation period, session number in a period.
+
+### Challenges
+
+- inconsistent url naming
+- inconsistent page layout also inside one country's documents. For example Belgium supplies their protocols in a bilingual form, in which every page has two columns, each written either in French or Dutch. Whether the left or right column is French was inconsistent. Even numbered periods generally had French on the right side of the page, but this wasn't always true, occasionally they swapped the order of the columns.
+- bandwidth
+
+## What data did we end up using?
+
+- We could not use the documents from Belgium's 1st period, because although laid out in two columns, the languages weren't written on either side, but interlaced sentence by sentence.
+
+# Analysis
+
+## Methodology
+
+- Creating document term matrices (without lemma stemming)
+- LDA models (number of topics, iterations other parameters)
+
+
+## Challenges
+
+- enormous computing resource (time, memory)
+- unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
+- languages that none of us speaks
+
+## Results
+
+- excerpts from the results as a table representation of the data frames
+- statistics
+- word clouds
+
+# Conclusion
+
+# Remarks
+
+# References
+
+e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
