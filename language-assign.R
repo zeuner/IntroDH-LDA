@@ -9,6 +9,8 @@ library(tidyverse)
 library(pracma)
 library(koRpus)
 
+source("language-detect.R")
+
 split_at <- 1000
 
 filename <- file.path(getwd(), "txts", "be-1-110.txt")
@@ -55,21 +57,6 @@ if (! dir.exists(split_directory)){
         writeLines(part_lines, part_name)
     }
 )
-
-## compute what fraction of the `words` are in the stopword list
-##  of the `language`
-language_match <- function (words, language) {
-    wordlist <- stopwords::stopwords(language, source = "stopwords-iso")
-    length(which(words %in% wordlist)) / length(words)
-}
-
-## compute which of the `languages` has the highest fraction of the `words`
-##  in its stopword list
-language_best_match <- function (words, languages) {
-    languages[[
-        which.max(map(languages, partial(language_match, words = words)))
-    ]]
-}
 
 parts <- Sys.glob(file.path(split_directory, "*.txt"))
 
