@@ -9,9 +9,11 @@ library(hunspell)
 library(pdftools)
 library(jsonlite)
 library(textmineR)
+library(koRpus)
 library(future.apply)
 plan(multisession)
 source("scrape.R")
+source("language-detect.R")
 
 ## -------------------------------------------------------------------
 ## Loading the website
@@ -161,7 +163,8 @@ writeLines(unlist(convert_results), file.path(result_directory, "be-convert_resu
 ## First period is more problematic due to its sentence-by-sentence
 ## translation
 
-id <- c(#Sys.glob(file.path(txt_directory, "be-1-*-left*.txt")),
+id <- c(Sys.glob(file.path(txt_directory, "be-1-*-left*.txt")),
+        Sys.glob(file.path(txt_directory, "be-1-*-right*.txt")),
         Sys.glob(file.path(txt_directory, "be-2-*-right*.txt")),
         Sys.glob(file.path(txt_directory, "be-3-*-left*.txt")),
         Sys.glob(file.path(txt_directory, "be-4-*-right*.txt")),
@@ -170,9 +173,17 @@ id <- c(#Sys.glob(file.path(txt_directory, "be-1-*-left*.txt")),
 
 data <- sapply(id, read_file)
 
-exported <- data.frame(id, data)
+language <- sapply(
+    data,
+    function (text) {
+        tokens <- tokenize(text, format = "obj", tag = FALSE)
+        language_best_match(tokens, c("en", "fr", "nl"))
+    }
+)
 
-json <- toJSON(exported)
+exported <- data.frame(id, data, language)
+
+json <- toJSON(exported[exported$language == "fr",])
 
 write(json, file="belgium.json")
 
