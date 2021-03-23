@@ -231,6 +231,34 @@ map(
     }
 )
 
+refs <- as(readRDS("poland-country-ref.rds"), "CsparseMatrix")
+model <- readRDS("poland-lda.Rds")
+dtm <- readRDS("poland-dtm.rds")
+country_topics <- t(refs) %*% predict(model, dtm, method = "dot")
+model$top_terms
+map(
+    attributes(country_topics)$Dimnames[[2]],
+    function (topic) {
+        result <- sort(
+            country_topics[, topic] - rowMeans(country_topics),
+            decreasing = TRUE
+        ) %>% head
+        result$topic <- topic
+        result
+    }
+)
+map(
+    attributes(country_topics)$Dimnames[[1]],
+    function (country) {
+        result <- sort(
+            country_topics[country,] - colMeans(country_topics),
+            decreasing = TRUE
+        ) %>% head
+        result$country <- country
+        result
+    }
+)
+
 refs <- as(readRDS("spain-country-ref.rds"), "CsparseMatrix")
 model <- readRDS("spain-lda.Rds")
 dtm <- readRDS("spain-dtm.rds")
