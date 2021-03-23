@@ -21,7 +21,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -32,7 +32,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -58,7 +58,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -69,7 +69,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -95,7 +95,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -106,7 +106,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -132,7 +132,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -143,7 +143,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -169,7 +169,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -180,7 +180,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -206,7 +206,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -217,7 +217,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -243,7 +243,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -254,7 +254,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -280,7 +280,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -291,7 +291,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -317,7 +317,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -328,7 +328,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
@@ -354,7 +354,7 @@ map(
     attributes(country_topics)$Dimnames[[2]],
     function (topic) {
         result <- sort(
-            country_topics[, topic] - rowMeans(country_topics),
+            country_topics[, topic] / rowMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$topic <- topic
@@ -365,7 +365,7 @@ map(
     attributes(country_topics)$Dimnames[[1]],
     function (country) {
         result <- sort(
-            country_topics[country,] - colMeans(country_topics),
+            country_topics[country,] / colMeans(country_topics),
             decreasing = TRUE
         ) %>% head
         result$country <- country
