@@ -36,91 +36,159 @@ Abstract
 - summary of what the reader should expect
 
 # Data Acquisition
-- EU parliaments
-- languages that we speak, also languages which we don't
 
-## Deciding on sources
+According to the original project idea, we needed to gather resources
+from various archives, which are accessible on the websites of each
+country's parliament. We gathered resources from ten EU member
+countries: Austria, Belgium, The Czech Republic, France, Hungary,
+Ireland, Italy, The Netherlands, Spain and Poland. Although every
+country that we worked with offered their protocols in a digital
+format, each of them was unique and downloading them had us face
+different challenges.
 
-- Austria:
-  Legislation periods:
-  - XXI: 29.10.1999--19.12.2002
-  - XXII: 20.12.2002--29.10.2006
-  - XXIII: 30.10.2006--27.10.2008
-  - XXIV: 28.10.2008--28.10.2013
-  - XXV: 29.10.2013--08.11.2017
-  - XXVI: 09.11.2017--22.10.2019
+After inspecting the archives, we could split them into two
+groups. One group offers their protocols (at least for the last couple
+of legislatory periods) as PDF documents, the other as HTML
+documents. Categorizing them into one or the other group helped
+deciding how to approach downloading the data. The PDF documents were
+usually longer than their HTML counterparts, consisting of everything
+that happened in one session, which in most cases corresponds to one
+day. The first country for which we downloaded PDF documents was
+Hungary, mainly for two reasons, the first being familiarity with the
+language and the second was the convenience of downloading. As none of
+the archives has a button to download everything, we had to write
+scraper scripts which have done the task, which otherwise done
+manually would have been very time consuming and error-prone. The
+convenience Hungary provided was that all documents for a given
+legislature period were gathered on a single HTML page, from which the
+URLs could be easily extracted for downloading. One thing we wish is
+that they had offered protocols from more legislature periods.
 
-  862 PDF documents / sessions, 51,722,689 total word count after removing table of contents etc.
-  
-- Belgium:
-  Legislation periods:
-  - 1995--1999
-  - 1999--2003
-  - 2003--2007
-  - 2007--2010
-  - 2010--2014
-  - 2014--2019
+Other countries, such as Austria, did not have a single-page interface
+from where we could have downloaded their protocols. Austria had a
+page for each session, which then included a link to the
+download. Luckily, we did not have to write a scraper that opens each
+of the hundreds of pages, since we discovered that they had a more
+convenient and consistent URL naming scheme than Hungary has, which
+enabled us to programatically generate the download URLs for each
+session and period as well. The only thing we had to make sure is to
+know how many sessions were held in each legislature period and how
+each naming scheme worked, where the latter we had to do through some
+reverse engineering in each case. Similar to Austria in this regard
+were Belgium, The Czech Republic, Spain and Italy.
 
-  1,097 PDF documents / sessions, 43,741,136 total word count after removing table of contents etc.
-  
-- Czech Republic:
-  Legislation periods:
-  - 2010--2013
-  - 2013--2017
-  - 2017--2021*
+Although there are more documents available for download from Austria,
+documents that were created earlier than what we decided to work with
+were not created using the PDF format, mostly scanned documents in
+inconsistent format. Including these documents would have been
+possible through optical character recognition, but the size and
+time-frame of the project did not allow us to explore every possible
+document. It is also worth to mention, that in order to better
+understand transnational relations, not only parliamentary debates are
+useful but other institutions' publicly available documents as well,
+which we did not include in this project.
 
-  186 PDF documents / sessions, 29,522,033 total word count after removing table of contents etc.
-  
-- France
-- Hungary:
-  Legislation periods:
-  - 2014--2018
-  - 2018--2021*
-  
-  451 PDF documents / sessions, 25,297,392 total word count after removing table of contents etc.
-  
-- Ireland:
-  Dáil debates from the 32nd Dáil, 2016--2020 (last session in December 2019)
+The Czech Republic also had a larger time-frame of documents
+available, but the format would have been HTML documents for earlier
+legislature periods, which we decided not to include. Spain had
+periods in the archive, where they had a link to the given period, but
+it was an empty directory. Ireland's stenographic protocols were
+uploaded with a consistent naming scheme, which in itself would not
+have been a problem, if the names have not had been consisted of the
+date of the session. In practice if meant a computationally rather
+expensive pattern matching with regular expressions in order to
+extract the URLs for the PDF files. Although this operation consumed
+more computing resources than generating the URLs according to a
+naming scheme, the overall bottleneck at this stage was the number of
+documents to download, bandwidth at the server's side and the fact
+that we could not implement a solution that can handle multiple
+asynchronous downloads.
 
-  394 PDF documents / sessions, 30,169,798 total word count after removing table of contents etc.
-  
-- Italy:
-  Legislature period:
-  - XVII: 15.03.2013--22.03.2018
+The next part was extracting raw text from the documents. For this
+task, we used the pdftools package for R. The pdf_data function that
+ships with it is able to extract text from PDF documents word by word,
+while retaining metadata such as x and y coordinates for each word and
+whether each word was at the end of a line. After some initial trial
+and error with figuring out each country's page layout, we were able
+to cut off page headers and footers, and pages which did not contain
+either one of the two. This was very practical, since title pages and
+tables of contents usually did not have headers (and
+footers). Removing any miscellaneous text followed, this was done
+through searching for the beginning and the end of each session, in
+each language this corresponded to the following forms: "The session
+started at ..." and "The session ended at ...". Only pages between
+these two terms did we retain. Contrary to DOC, HTML and other
+document formats, text extracted from PDF documents remains
+hyphenated. This meant that unhyphenating the text was essential in
+preparing the raw data to train LDA models on it. This step was done
+by concatenating every word at the end of a line with the first word
+fragment of the following line, if it ended with a hyphen. This
+procedure however, resulted in too long lines. Line breaks and any
+unnecessary whitespace was removed next, as we did not need the
+information of what each token's line number is. In order to obtain
+cleaner results and to be on a par with the shorter HTML documents,
+each session was split into smaller chunks of maximum 1000
+tokens. Before this final step, many of them would have been more than
+20,000 tokens long.
 
-  923 PDF documents / sessions, 43,483,753 total word count after removing table of contents etc.
-- The Netherlands
-- Poland
-- Spain:
-  Legislature periods:
-  - X: 13.12.2011--27.10.2015
-  - XI: 13.01.2016--03.05.2016
-  - XII: 19.07.2016--05.03.2019
-  - XIII: 21.05.2019--24.09.2019
-  - XIV: 03.12.2019--2021*
+Extracting raw text from the PDF documents was generally a
+straightforward process except for Belgium. The most notable
+difference was that being a bilingual country, they offer their
+protocols in a bilingual format, where each language is either on the
+left or right side of the page. This would not have been a problem, if
+the languages were always on the same side. This became obvious only
+as we started to expand our initially rather small amount of data to
+include more legislature periods from each country. This was done due
+to concerns about lemma stemming, which we decided not to apply to our
+data at all. This however, needed us increasing the amount of data at
+hand. At the beginning only one period's documents were downloaded
+from Belgium, where the sides for each language were consistent, but
+this consistency changed as we introduced data from previous
+periods. We thought of multiple implementations to tackle this
+problem, for example we had an observation, that even numbered
+legislature periods tended to have French text on the right side, but
+this was not always true, and it was unreliable to the point, that
+many of the topics in the LDA topic model were in fact not in French,
+but Dutch. In short, we were not satisfied with this approach. Later
+on, we settled on an implementation, where the program checked each
+document (e.g. 3rd period, Session no. 30., left side) whether it was
+written in Dutch or French. Although this approach was computationally
+more expensive than sheer guessing, because it checked the probability
+of the possible languages for each document by searching for stop
+words, this method turned out to work very accurately. We still ended
+up not being able to use the first period's documents, since the
+languages were not separated to either side, but intermingled as a
+sentence-by-sentence translation, which in some cases became
+paragraph-by-paragraph translation, or in extreme cases some text was
+not translated at all.
 
-  331 PDF documents / sessions, 19,491,066 total word count after removing table of contents etc.
+After extracting the text from the PDF documents, we collected the
+resulting text files into one JSON file for each country, which were
+then used to created the document term matrices.
 
-## Downloading the data
+The challenge with HTML countries was that they did not always have an
+easily understandable URL naming schema, and that the sessions were
+not on one page but scattered through multiple HTML documents. For
+example debates from Poland were scattered through the websites of
+individual politicians, which had to be concatenated to get full
+debates.
 
-- we wrote scraper scripts
-- There were two kinds of archives: PDF and HTML. Some of the archives which offer PDF documents to download didn't have a consistent URL naming scheme for the documents, which had us extract the urls from their websites.
-- How did we scrape data which were in HTML documents?
+The following table summarizes the amount of data we were able to
+gather for this project.
 
-### Converting the documents to plain text
 
-- How did we convert HTML documents to plain text?
-- PDF documents were converted in each scraper script. We had to analyze the page layout of each country's protocols. Following steps were necessary to produce usable data: removing page headers and footers, removing empty pages, removing title page, table of contents etc., unhypthenating the text, splitting the documents to smaller chunks of maximum 1000 words size (here a reference to the paper which explained why it's important to do so), systematic document naming which contains information about country, legislation period, session number in a period.
-
-### Challenges
-
-- inconsistent url naming
-- inconsistent page layout also inside one country's documents. For example Belgium supplies their protocols in a bilingual form, in which every page has two columns, each written either in French or Dutch. Whether the left or right column is French was inconsistent. Even numbered periods generally had French on the right side of the page, but this wasn't always true, occasionally they swapped the order of the columns.
-- bandwidth
-
-## What data did we end up using?
-
-- We could not use the documents from Belgium's 1st period, because although laid out in two columns, the languages weren't written on either side, but interlaced sentence by sentence.
+| Country            | No. of legislature periods | Time Range | Word Count          |
+|--------------------|----------------------------|------------|---------------------|
+| Austria            |                          6 | 1999--2019 | 51,722,689          |
+| Belgium            |                          5 | 1999--2019 | 22,356,325 (French) |
+| The Czech Republic |                          3 | 2010--2021 | 29,522,033          |
+| France             |                          ? |          ? | ?                   |
+| Hungary            |                          2 | 2014--2021 | 25,297,392          |
+| Ireland            |                          1 | 2016--2020 | 30,169,798          |
+| Italy              |                          1 | 2013--2018 | 43,483,753          |
+| The Netherlands    |                          ? |          ? | ?                   |
+| Poland             |                          ? |          ? | ?                   |
+| Spain              |                          5 | 2011--2021 | 19,491,066          |
 
 # Analysis
 
