@@ -1,0 +1,433 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  12pt,
+]{scrreprt}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vfill{}
+\input{uni_logo.pdf_tex} \par
+\vspace{3cm}
+{\bfseries\huge Analyzing Transnational Relationships in Parliament Debates \par}
+\vspace{1cm}
+{\large Agoston Volcz, Jonathan Weinmann, Isidor Zeuner \par
+March 14. 2021}
+
+\vfill
+Fakultät für Mathematik und Informatik \\
+Seminar: 10-207-0001 Einführung in die Digital Humanities \\
+Lecturer: Thomas Köntges, Ph.D. \\
+Semester: WS 2020/2021
+
+
+\end{titlepage}
+\setcounter{page}{1}
+\tableofcontents
+
+Abstract
+
+\hypertarget{introduction}{%
+\chapter{Introduction}\label{introduction}}
+
+Parliaments usually make corrected versions of their plenary minutes
+available for public inspection on the internet. The minutes contain the
+speeches of the MPs, reports and debates. These documents are accessible
+to everybody, but the large amount of the documents makes it difficult
+to index and search. And it is even more difficult to recognise complex
+topics, connections and ``between the lines'' content. In order to be
+able to make a meaningful analysis of these provided documents,
+preliminary work must be done. The documents must be downloaded, cleaned
+up in a way that elements not carrying any information will be removed.
+Furthermore, they have to be converted into a structured format so that
+the machine can work with them. The computer must then be trained to
+``understand'' the documents and produce human readable output. This
+preliminary work is to be done with this project. Analysing parliament
+debates on European level was the basic idea of our Project. Away from
+the topic, it was the interest in text-based analysis and topic
+modelling that brought us together as a group. In the beginning we
+didn't have a concrete idea of a specific research question. We thought
+it would be useful to have a simpler and clearer way of giving an
+insight into the debates of the parliaments, as it is hardly possible to
+keep track of the unbelievably large amount of the minutes of the
+meetings. And it is even more difficult to deal specifically with a
+particular topic within them. Based on this impulse, the idea came up to
+look for transnational relations that emerge in the debates and using
+Natural Language Processing and LDA Topic Modelling as a tool. During
+the implementation of the project, it became increasingly clear that the
+focus was shifting. It was no longer just about answering this one
+question that had been asked with the technical tools, but rather to
+develop a tool with which it is possible to work on our initial research
+idea and similar questions based on it. As well limits of the method
+became visible and that it can only cover a part. So, we came up to
+rephrase the question like this: To what extent can our technical
+approach help finding transnational relations between countries from the
+text corpora? During the report, it should be made clear how the tool
+was developed, at which points we reached our limits and which solutions
+we considered. The first part of the report describes the organisational
+process of the project. How did we communicate and share our results?
+Decisions which data and which tools we will use will be presented in
+this part. The focus will then be on data collection, conversion and the
+topic model. It is about building a tool for web-scraping and adapting
+it to the different formats offered on the government websites. The
+final step was to create the topic model and to analyse it. The emphasis
+in our project is more on the technical aspect and the handling,
+controlling and processing of the data sets as well as the formation of
+the topic model than on the analysis.
+
+\hypertarget{organisation}{%
+\chapter{Organisation}\label{organisation}}
+
+The first thing was to set up an infrastructure in which we could
+communicate. For this we first used ChaosPad. This made it possible for
+everyone to exchange initial ideas. We decided to use the pad for the
+more humanities questions and topics and to switch to Git and Github for
+the exchange and organisation of code. After setting up a
+RocketChat-Channel for organisational purposes, however, most
+communication, both organisational, technical and intellectual, quickly
+took place there.\\
+Since the topic of the project is the analysis of parliamentary debates
+of different but of course as many European countries as possible we
+already encountered the first difficulty and above all the first
+limitation which would mean a bias in the analysis. In order to
+interpret the debates as accurately as possible, it is a prerequisite
+that we speak the languages or at least have a certain understanding of
+them. So, we ended up working with data from the parliaments of Austria,
+Belgium, the Czech Republic, Hungary, Italy, Ireland, Poland, France and
+the Netherlands. It is important to emphasise that we are limited at
+this point and that this is not an ideal condition. The parliamentary
+minutes were made available on the websites of the respective
+governments. However, it turned out that both the scope in terms of
+years and the type of document as well as the presentation in the
+documents varied considerably. The detailed data collection is dealt
+with in point 3. After deciding on the data, it was a question of which
+tools we would work with. Although all participants had either no or
+little experience with R, we decided to use this programming language
+for the project in view of the content of the semester and not ScraPy,
+which is written in Python and specially designed for web scraping. So,
+it was a challenge to tackle and manage the project with R. Due to the
+computationally intensive scripts and the large amounts of data, we
+reached our limits with our computing capacities. Some scripts ran for
+up to 3 days and required large capacities of virtual memory. As a
+result, the work process slowed down considerably and changes to the
+configurations for the LDA topic model had to be planned and decided on
+what the benefits would be. This meant a limitation in flexibility and
+experimentation in designing the models. In order to have more
+resources, we asked the computer science department if they could
+provide a suitable machine. This was not the case and the university
+computer centre did not have enough free space for us to work on their R
+cluster. One possibility would have been to implement our modelling as a
+SLURM job. This would have been exciting, but since we had no experience
+with SLURM, the preparation would have been too time-consuming and
+probably beyond the scope of our project. So, we had to deal with this
+technical limitation and adapt the objective accordingly.
+
+\hypertarget{data-acquisition}{%
+\chapter{Data Acquisition}\label{data-acquisition}}
+
+\begin{itemize}
+\tightlist
+\item
+  EU parliaments
+\item
+  languages that we speak, also languages which we don't
+\end{itemize}
+
+\hypertarget{deciding-on-sources}{%
+\section{Deciding on sources}\label{deciding-on-sources}}
+
+\begin{itemize}
+\item
+  Austria: Legislation periods:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    XXI: 29.10.1999--19.12.2002
+  \item
+    XXII: 20.12.2002--29.10.2006
+  \item
+    XXIII: 30.10.2006--27.10.2008
+  \item
+    XXIV: 28.10.2008--28.10.2013
+  \item
+    XXV: 29.10.2013--08.11.2017
+  \item
+    XXVI: 09.11.2017--22.10.2019
+  \end{itemize}
+
+  862 PDF documents / sessions, 51,722,689 total word count after
+  removing table of contents etc.
+\item
+  Belgium: Legislation periods:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    1995--1999
+  \item
+    1999--2003
+  \item
+    2003--2007
+  \item
+    2007--2010
+  \item
+    2010--2014
+  \item
+    2014--2019
+  \end{itemize}
+
+  1,097 PDF documents / sessions, 43,741,136 total word count after
+  removing table of contents etc.
+\item
+  Czech Republic: Legislation periods:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    2010--2013
+  \item
+    2013--2017
+  \item
+    2017--2021*
+  \end{itemize}
+
+  186 PDF documents / sessions, 29,522,033 total word count after
+  removing table of contents etc.
+\item
+  France
+\item
+  Hungary: Legislation periods:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    2014--2018
+  \item
+    2018--2021*
+  \end{itemize}
+
+  451 PDF documents / sessions, 25,297,392 total word count after
+  removing table of contents etc.
+\item
+  Ireland: Dáil debates from the 32nd Dáil, 2016--2020 (last session in
+  December 2019)
+
+  394 PDF documents / sessions, 30,169,798 total word count after
+  removing table of contents etc.
+\item
+  Italy: Legislature period:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    XVII: 15.03.2013--22.03.2018
+  \end{itemize}
+
+  923 PDF documents / sessions, 43,483,753 total word count after
+  removing table of contents etc.
+\item
+  The Netherlands
+\item
+  Poland
+\item
+  Spain: Legislature periods:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    X: 13.12.2011--27.10.2015
+  \item
+    XI: 13.01.2016--03.05.2016
+  \item
+    XII: 19.07.2016--05.03.2019
+  \item
+    XIII: 21.05.2019--24.09.2019
+  \item
+    XIV: 03.12.2019--2021*
+  \end{itemize}
+
+  331 PDF documents / sessions, 19,491,066 total word count after
+  removing table of contents etc.
+\end{itemize}
+
+\hypertarget{downloading-the-data}{%
+\section{Downloading the data}\label{downloading-the-data}}
+
+\begin{itemize}
+\tightlist
+\item
+  we wrote scraper scripts
+\item
+  There were two kinds of archives: PDF and HTML. Some of the archives
+  which offer PDF documents to download didn't have a consistent URL
+  naming scheme for the documents, which had us extract the urls from
+  their websites.
+\item
+  How did we scrape data which were in HTML documents?
+\end{itemize}
+
+\hypertarget{converting-the-documents-to-plain-text}{%
+\subsection{Converting the documents to plain
+text}\label{converting-the-documents-to-plain-text}}
+
+\begin{itemize}
+\tightlist
+\item
+  How did we convert HTML documents to plain text?
+\item
+  PDF documents were converted in each scraper script. We had to analyze
+  the page layout of each country's protocols. Following steps were
+  necessary to produce usable data: removing page headers and footers,
+  removing empty pages, removing title page, table of contents etc.,
+  unhypthenating the text, splitting the documents to smaller chunks of
+  maximum 1000 words size (here a reference to the paper which explained
+  why it's important to do so), systematic document naming which
+  contains information about country, legislation period, session number
+  in a period.
+\end{itemize}
+
+\hypertarget{challenges}{%
+\subsection{Challenges}\label{challenges}}
+
+\begin{itemize}
+\tightlist
+\item
+  inconsistent url naming
+\item
+  inconsistent page layout also inside one country's documents. For
+  example Belgium supplies their protocols in a bilingual form, in which
+  every page has two columns, each written either in French or Dutch.
+  Whether the left or right column is French was inconsistent. Even
+  numbered periods generally had French on the right side of the page,
+  but this wasn't always true, occasionally they swapped the order of
+  the columns.
+\item
+  bandwidth
+\end{itemize}
+
+\hypertarget{what-data-did-we-end-up-using}{%
+\section{What data did we end up
+using?}\label{what-data-did-we-end-up-using}}
+
+\begin{itemize}
+\tightlist
+\item
+  We could not use the documents from Belgium's 1st period, because
+  although laid out in two columns, the languages weren't written on
+  either side, but interlaced sentence by sentence.
+\end{itemize}
+
+\hypertarget{analysis}{%
+\chapter{Analysis}\label{analysis}}
+
+\hypertarget{methodology}{%
+\section{Methodology}\label{methodology}}
+
+\begin{itemize}
+\tightlist
+\item
+  Creating document term matrices (without lemma stemming)
+\item
+  LDA models (number of topics, iterations other parameters)
+\end{itemize}
+
+\hypertarget{challenges-1}{%
+\section{Challenges}\label{challenges-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  enormous computing resource (time, memory)
+\item
+  unfamiliarity with the theoretical background of LDA topic modeling,
+  lack of experience
+\item
+  languages that none of us speaks
+\end{itemize}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\begin{itemize}
+\tightlist
+\item
+  excerpts from the results as a table representation of the data frames
+\item
+  statistics
+\item
+  word clouds
+\end{itemize}
+
+\hypertarget{conclusion}{%
+\chapter{Conclusion}\label{conclusion}}
+
+\hypertarget{remarks}{%
+\chapter{Remarks}\label{remarks}}
+
+\hypertarget{references}{%
+\chapter{References}\label{references}}
+
+e.g.~websites of various parliaments, research papers we read on the
+topic, libraries we used for the analysis etc.
+
+\end{document}
