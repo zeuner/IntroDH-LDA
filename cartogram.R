@@ -321,19 +321,26 @@ map(
     }
 )
 
-write_topic_cartogram <- function (topic, country_topics, country) {
-    world_polygons <- map2SpatialPolygons(
-        worldmap,
-        IDs = worldmap$names %>% map_names_transform
+map2spatial_polygons_data_frame <- function (map) {
+    polygons <- map2SpatialPolygons(
+        map,
+        IDs = map$names %>% map_names_transform
     )
-    pid <- sapply(slot(world_polygons, "polygons"), function(x) slot(x, "ID")) 
-    world_polygons.df <- data.frame(
-        ID = 1 : length(world_polygons),
+    pid <- sapply(slot(polygons, "polygons"), function(x) slot(x, "ID"))
+    polygons.df <- data.frame(
+        ID = 1 : length(polygons),
         row.names = pid
     )
-    world_polygons <- SpatialPolygonsDataFrame(
-        world_polygons,
-        world_polygons.df
+    polygons <- SpatialPolygonsDataFrame(
+        polygons,
+        polygons.df
+    )
+    polygons
+}
+
+write_topic_cartogram <- function (topic, country_topics, country) {
+    world_polygons <- map2spatial_polygons_data_frame(
+        worldmap
     )
     country_fractions <- country_topics[, topic] / rowMeans(country_topics)
     data <- data.frame(
