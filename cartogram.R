@@ -383,10 +383,14 @@ write_topic_cartogram <- function (topic, country_topics, country) {
 }
 
 
-write_country_topics_cartograms <- function (country) {
+write_country_topics_cartograms <- function (country, topics = NA) {
     country_topics <- readRDS(paste0(country, "-country-topics.rds"))
+    processed_topics <- attributes(country_topics)$Dimnames[[2]]
+    if (!is.na(topics)) {
+        processed_topics <- intersect(processed_topics, topics)
+    }
     map(
-        attributes(country_topics)$Dimnames[[2]],
+        processed_topics,
         partial(
             write_topic_cartogram,
             country_topics = country_topics,
