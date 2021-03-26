@@ -289,11 +289,84 @@ gather for this project.
 
 # Analysis
 
-## Methodology
+## Method
 
-- Creating document term matrices (without lemma stemming)
-- LDA models (number of topics, iterations other parameters)
+Our initial approach to the analysis was to first create document term
+matrices from the cleaned up data, then train an LDA topic model on
+it. We first created document term matrices, where stop words
+shipped with the SnowballC package were removed, and lemmas were
+normalized using hunspell. After training the model on these matrices,
+we began to notice multiple problems with this approach. The first
+problem was that nearly all topics had similar top terms. These were
+not stop words in the traditional sense, but nevertheless
+irrelevant. This included words like 'congressman', 'house', 'please'
+and 'thank you'. To remove these words, we first created an extended
+list of words that we considered to be stop words. Following
+additional research, we concluded, that it's not a good idea to remove
+these words before training the model, as this would introduce
+unwanted bias to the results and may even distract the algorithm to
+find the topics. So we decided not to remove additional stop words
+from the data.
 
+During our research, we learnt that lemma stemming can also introduce
+anomalies into the results. As Thomas Köntges pointed out in his
+article[^1], increasing the data volume helps to maintain accuracy
+when removing the lemma stemming step from the analysis. We needed to
+increase the data volume, since most of the languages we worked with
+have a higher morphological complexity than English. We had collected
+only one legislation period's data from each PDF country. The amount
+of data for most countries was below 13 million tokens. At this point
+in the analysis we decided to include more legislation periods, so we
+went back to the data acquisition part to get more data. Also at this
+time, we decided to cut long documents into shorter parts, which had
+us modify the scraper scripts accordingly. The difficulty with
+Belgium's parliamentary minutes mentioned in point 3 became obvious
+during this step.
+
+As for the topic modelling algorithm, we started with 20 topics. Since
+many of the topics were not really topics but rather a collection of
+common words in a parliament, we increased the number of topics. These
+changes led to our problem with computing resources. Running the
+algorithm with the increased data set and increased topic number also
+increased computing time and memory usage. Since the algorithm is not
+parallelised, we could run several country's scripts at the same time,
+because the memory usage also allowed this. After the increase, this
+was not possible any more, even on multiple CPU systems, because
+increased memory usage usually did not allow to do so. This slowed
+down our progress significantly. For countries that had less data,
+running the algorithm took between 8 to 10 hours, for more data,
+it could take 2--3 days. Changing one parameter cost us from several days
+up to one week of computing time, in which we could not further improve
+our approach to analysis. Finally, as we increased the number of
+topics to 100, we stopped changing the parameters given to the
+algorithm and started to work more on the analysis.
+
+Our first approach was to (manually) search for country names, city
+names or topics that had to do with other countries. All countries had
+references to Belgium, which we explained with the European Committee
+having its headquarters in Brussels, Belgium. There were also mentions
+of the Euro crisis, refugee crisis, and in newer documents the
+coronavirus pandemic. While Austria had a topic that most probably had
+to do with nuclear energy plants, which included references to the
+Czech Republic, Hungary also had a similar topic with references to
+Russia. The reason for this is that in the last two legislation
+periods the Hungarian government decided to extend Hungary's only one
+nuclear plant funded with Russian credit. Hungary also had a topic,
+which, although did not contain many references to countries, it
+included the name of George Soros. With some background knowledge,
+this topic can also be counted as a transnational relation. The
+reasoning behind this has to do with the Orban regime's blaming the
+EU's proposition of refugee quotas on the influence of Soros and his
+Open Society Foundations, even accusing him of funding human
+trafficking across the Mediterranean.
+
+This manual searching however, is not reproducible, and it is easy to
+introduce our own biases coming from our knowledge of politics or lack
+thereof into the results. In order to avoid these negative effects, we
+opted for another approach.
+
+(Here comes Isidor's latest improvements for the analysis, including
+results and visualizaion.)
 
 ## Challenges
 
@@ -314,3 +387,6 @@ gather for this project.
 # References
 
 e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
+
+[^1]: Thomas Köntges: *Measusing Philosophy in the First Thousand Years
+of Greek Literature*. In Digital Classics Online, 2020. P. 1--23.
