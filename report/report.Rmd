@@ -132,6 +132,8 @@ Since the topic of the project is the analysis of parliamentary debates of diffe
 
 # Analysis
 
+The narrowing of the topic raises a few problems that should be addressed here. It must be clarified what is meant by "relevant”. As the research question is deliberately open-ended and invites further questions, it seems impossible to give a universal definition of the term "relevant". Relevance means a situational importance that someone attaches to something in a particular context. In the same way, relevance is always related to the everyday knowledge of the recipient and the importance of individual topics varies accordingly. In the analysis, therefore, one's own bias must always be taken into account as to which topics now seem relevant and important to the individual. When a user searches for topics related to transnational relations, he or she probably has certain expectations regarding the results. Based on these expectations, they can decide whether a topic is relevant to them or not. Therefore, the goal should be to make the analysis as neutral as possible. And accordingly, the tool, the topic model, should be as free of bias as possible.
+
 ## Methodology
 
 - Creating document term matrices (without lemma stemming)
