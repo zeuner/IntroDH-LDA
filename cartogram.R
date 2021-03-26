@@ -9,8 +9,7 @@ library(tidyverse)
 library(maptools)
 library(textmineR)
 library(getcartr)
-
-colours <- colorRampPalette(c("navy", "deepskyblue"))(33)
+library(tmaptools)
 
 worldmap <- maps::map("world", fill = TRUE, plot = FALSE)
 
@@ -359,25 +358,13 @@ write_topic_cartogram <- function (topic, country_topics, country) {
         world_polygons,
         world_polygons$data.fraction.matched.
     )
-    values <- seq(
-        from = min(na.omit(world_polygons$data.fraction.matched.)),
-        to = max(na.omit(world_polygons$data.fraction.matched.)),
-        length.out = 33
-    )
-    country_colours <- map(
-        world_polygons$data.fraction.matched.,
-        function (value) {
-            found <- which(values < value) %>% max
-            if (is.infinite(found)) {
-                return ("black")
-            }
-            colours[found]
-        }
-    ) %>% unlist
+    set.seed(12833)
+    colouring <- world_polygons %>% map_coloring
+    colours <- colorRampPalette(c("red", "blue", "yellow"))(colouring %>% max)
     png(paste0(country, "-", topic, ".png"), width = 1024, height = 1024)
     plot(
         world_polygons.carto,
-        col = country_colours,
+        col = colours[colouring],
         main = paste0(
             "Cartogram of the topic ",
             topic,
