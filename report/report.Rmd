@@ -3,7 +3,10 @@ output:
   pdf_document:
     highlight: tango
     number_sections: true
-documentclass: scrreprt
+documentclass: scrartcl
+header-includes:
+  - \usepackage{setspace}
+  - \onehalfspacing
 fontsize: 12pt
 ---
 ```{=latex}
@@ -12,7 +15,7 @@ fontsize: 12pt
 \vfill{}
 \input{uni_logo.pdf_tex} \par
 \vspace{3cm}
-{\bfseries\huge Analyzing Transnational Relationships in Parliament Debates \par}
+{\bfseries\huge Analysing Transnational Relationships in Parliament Debates \par}
 \vspace{1cm}
 {\large Agoston Volcz, Jonathan Weinmann, Isidor Zeuner \par
 March 14. 2021}
@@ -27,37 +30,121 @@ Semester: WS 2020/2021
 \end{titlepage}
 \setcounter{page}{1}
 \tableofcontents
+\clearpage
 ```
-
-Abstract
-
 # Introduction
 
-Parliaments usually make corrected versions of their plenary minutes available for public inspection on the internet. The minutes contain the speeches of the MPs, reports and debates. These documents are accessible to everybody, but the large amount of the documents makes it difficult to index and search. And it is even more difficult to recognise complex topics, connections and "between the lines" content. In order to be able to make a meaningful analysis of these provided documents, preliminary work must be done. The documents must be downloaded, cleaned up in a way that elements not carrying any information will be removed. Furthermore, they have to be converted into a structured format so that the machine can work with them. The computer must then be trained to "understand" the documents and produce human readable output. This preliminary work is to be done with this project.
-Analysing parliament debates on European level was the basic idea of our Project. Away from the topic, it was the interest in text-based analysis and topic modelling that brought us together as a group. In the beginning we didn’t have a concrete idea of a specific research question. We thought it would be useful to have a simpler and clearer way of giving an insight into the debates of the parliaments, as it is hardly possible to keep track of the unbelievably large amount of the minutes of the meetings. And it is even more difficult to deal specifically with a particular topic within them. Based on this impulse, the idea came up to look for transnational relations that emerge in the debates and using Natural Language Processing and LDA Topic Modelling as a tool. During the implementation of the project, it became increasingly clear that the focus was shifting. It was no longer just about answering this one question that had been asked with the technical tools, but rather to develop a tool with which it is possible to work on our initial research idea and similar questions based on it. As well limits of the method became visible and that it can only cover a part. So, we came up to rephrase the question like this: To what extent can our technical approach help finding transnational relations between countries from the text corpora? 
-During the report, it should be made clear how the tool was developed, at which points we reached our limits and which solutions we considered. The first part of the report describes the organisational process of the project. How did we communicate and share our results? Decisions which data and which tools we will use will be presented in this part. The focus will then be on data collection, conversion and the topic model. It is about building a tool for web-scraping and adapting it to the different formats offered on the government websites. The final step was to create the topic model and to analyse it. The emphasis in our project is more on the technical aspect and the handling, controlling and processing of the data sets as well as the formation of the topic model than on the analysis. 
+Parliaments usually make corrected versions of their plenary minutes
+available for public inspection on the internet. The minutes contain
+the speeches of the MPs, reports and debates. These documents are
+accessible to everybody, but the large amount of the documents makes
+it difficult to index and search. And it is even more difficult to
+recognise complex topics, connections and "between the lines"
+content. In order to be able to make a meaningful analysis of these
+provided documents, preliminary work must be done. The documents must
+be downloaded, cleaned up in a way that elements not carrying any
+information will be removed. Furthermore, they have to be converted
+into a structured format so that the machine can work with them. The
+computer must then be trained to "understand" the documents and
+produce human readable output. This preliminary work is to be done
+with this project.
 
-# Organisation 
+Analysing parliament debates on European level was the basic idea of
+our Project. Away from the topic, it was the interest in text-based
+analysis and topic modelling that brought us together as a group. In
+the beginning we didn’t have a concrete idea of a specific research
+question. We thought it would be useful to have a simpler and clearer
+way of giving an insight into the debates of the parliaments, as it is
+hardly possible to keep track of the unbelievably large amount of the
+minutes of the meetings. And it is even more difficult to deal
+specifically with a particular topic within them. Based on this
+impulse, the idea came up to look for transnational relations that
+emerge in the debates and using Natural Language Processing and LDA
+Topic Modelling as a tool. During the implementation of the project,
+it became increasingly clear that the focus was shifting. It was no
+longer just about answering this one question that had been asked with
+the technical tools, but rather to develop a tool with which it is
+possible to work on our initial research idea and similar questions
+based on it. As well limits of the method became visible and that it
+can only cover a part. So, we came up to rephrase the question like
+this: To what extent can our technical approach help finding
+transnational relations between countries from the text corpora?
 
-The first thing was to set up an infrastructure in which we could communicate. For this we first used ChaosPad. This made it possible for everyone to exchange initial ideas. We decided to use the pad for the more humanities questions and topics and to switch to Git and Github for the exchange and organisation of code. After setting up a RocketChat-Channel for organisational purposes, however, most communication, both organisational, technical and intellectual, quickly took place there. 							
-Since the topic of the project is the analysis of parliamentary debates of different but of course as many European countries as possible we already encountered the first difficulty and above all the first limitation which would mean a bias in the analysis. In order to interpret the debates as accurately as possible, it is a prerequisite that we speak the languages or at least have a certain understanding of them. So, we ended up working with data from the parliaments of Austria, Belgium, the Czech Republic, Hungary, Italy, Ireland, Poland, France and the Netherlands. It is important to emphasise that we are limited at this point and that this is not an ideal condition. The parliamentary minutes were made available on the websites of the respective governments. However, it turned out that both the scope in terms of years and the type of document as well as the presentation in the documents varied considerably. The detailed data collection is dealt with in point 3. After deciding on the data, it was a question of which tools we would work with. Although all participants had either no or little experience with R, we decided to use this programming language for the project in view of the content of the semester and not ScraPy, which is written in Python and specially designed for web scraping. So, it was a challenge to tackle and manage the project with R. Due to the computationally intensive scripts and the large amounts of data, we reached our limits with our computing capacities. Some scripts ran for up to 3 days and required large capacities of virtual memory. As a result, the work process slowed down considerably and changes to the configurations for the LDA topic model had to be planned and decided on what the benefits would be. This meant a limitation in flexibility and experimentation in designing the models. In order to have more resources, we asked the computer science department if they could provide a suitable machine. This was not the case and the university computer centre did not have enough free space for us to work on their R cluster. One possibility would have been to implement our modelling as a SLURM job. This would have been exciting, but since we had no experience with SLURM, the preparation would have been too time-consuming and probably beyond the scope of our project. So, we had to deal with this technical limitation and adapt the objective accordingly. 
+During the report, it should be made clear how the tool was developed,
+at which points we reached our limits and which solutions we
+considered. The first part of the report describes the organisational
+process of the project. How did we communicate and share our results?
+Decisions which data and which tools we will use will be presented in
+this part. The focus will then be on data collection, conversion and
+the topic model. It is about building a tool for web-scraping and
+adapting it to the different formats offered on the government
+websites. The final step was to create the topic model and to analyse
+it. The emphasis in our project is more on the technical aspect and
+the handling, controlling and processing of the data sets as well as
+the formation of the topic model than on the analysis.
+
+# Organisation
+
+The first thing was to set up an infrastructure in which we could
+communicate. For this we first used ChaosPad. This made it possible
+for everyone to exchange initial ideas. We decided to use the pad for
+the more humanities questions and topics and to switch to Git and
+Github for the exchange and organisation of code. After setting up a
+RocketChat-Channel for organisational purposes, however, most
+communication, both organisational, technical and intellectual,
+quickly took place there.
+
+Since the topic of the project is the analysis of parliamentary
+debates of different but of course as many European countries as
+possible we already encountered the first difficulty and above all the
+first limitation which would mean a bias in the analysis. In order to
+interpret the debates as accurately as possible, it is a prerequisite
+that we speak the languages or at least have a certain understanding
+of them. So, we ended up working with data from the parliaments of
+Austria, Belgium, the Czech Republic, Hungary, Italy, Ireland, Poland,
+France and the Netherlands. It is important to emphasise that we are
+limited at this point and that this is not an ideal condition. The
+parliamentary minutes were made available on the websites of the
+respective governments. However, it turned out that both the scope in
+terms of years and the type of document as well as the presentation in
+the documents varied considerably. The detailed data collection is
+dealt with in point 3. After deciding on the data, it was a question
+of which tools we would work with. Although all participants had
+either no or little experience with R, we decided to use this
+programming language for the project in view of the content of the
+semester and not ScraPy, which is written in Python and specially
+designed for web scraping. So, it was a challenge to tackle and manage
+the project with R. Due to the computationally intensive scripts and
+the large amounts of data, we reached our limits with our computing
+capacities. Some scripts ran for up to 3 days and required large
+capacities of virtual memory. As a result, the work process slowed
+down considerably and changes to the configurations for the LDA topic
+model had to be planned and decided on what the benefits would
+be. This meant a limitation in flexibility and experimentation in
+designing the models. In order to have more resources, we asked the
+computer science department if they could provide a suitable
+machine. This was not the case and the university computer centre did
+not have enough free space for us to work on their R cluster. One
+possibility would have been to implement our modelling as a SLURM
+job. This would have been exciting, but since we had no experience
+with SLURM, the preparation would have been too time-consuming and
+probably beyond the scope of our project. So, we had to deal with this
+technical limitation and adapt the objective accordingly.
 
 
 # Data Acquisition
 
 According to the original project idea, we needed to gather resources
 from various archives, which are accessible on the websites of each
-country's parliament. We gathered resources from ten EU member
-countries: Austria, Belgium, The Czech Republic, France, Hungary,
-Ireland, Italy, The Netherlands, Spain and Poland. Although every
-country that we worked with offered their protocols in a digital
-format, each of them was unique and downloading them had us face
-different challenges.
+country's parliament. As mentioned above, we gathered resources from
+ten EU member countries. Although every country that we worked with
+offered their minutes in a digital format, each of them was unique and
+downloading them had us face different challenges.
 
 After inspecting the archives, we could split them into two
 groups. One group offers their protocols (at least for the last couple
-of legislatory periods) as PDF documents, the other as HTML
-documents. Categorizing them into one or the other group helped
+of legislation periods) as PDF documents, the other as HTML
+documents. Categorising them into one or the other group helped
 deciding how to approach downloading the data. The PDF documents were
 usually longer than their HTML counterparts, consisting of everything
 that happened in one session, which in most cases corresponds to one
@@ -73,7 +160,7 @@ URLs could be easily extracted for downloading. One thing we wish is
 that they had offered protocols from more legislature periods.
 
 Other countries, such as Austria, did not have a single-page interface
-from where we could have downloaded their protocols. Austria had a
+from where we could have downloaded the data we needed. Austria had a
 page for each session, which then included a link to the
 download. Luckily, we did not have to write a scraper that opens each
 of the hundreds of pages, since we discovered that they had a more
@@ -81,20 +168,20 @@ convenient and consistent URL naming scheme than Hungary has, which
 enabled us to programatically generate the download URLs for each
 session and period as well. The only thing we had to make sure is to
 know how many sessions were held in each legislature period and how
-each naming scheme worked, where the latter we had to do through some
-reverse engineering in each case. Similar to Austria in this regard
-were Belgium, The Czech Republic, Spain and Italy.
+the naming scheme worked, where the latter we had to do repeatedly
+through some reverse engineering for each country. Similar to Austria
+in this regard were Belgium, The Czech Republic, Spain and Italy.
 
 Although there are more documents available for download from Austria,
 documents that were created earlier than what we decided to work with
-were not created using the PDF format, mostly scanned documents in
-inconsistent format. Including these documents would have been
-possible through optical character recognition, but the size and
+were not created using the PDF format, they were mostly scanned documents with
+inconsistent formatting. Including these documents would have been
+possible by implementing optical character recognition, but the size and
 time-frame of the project did not allow us to explore every possible
 document. It is also worth to mention, that in order to better
 understand transnational relations, not only parliamentary debates are
 useful but other institutions' publicly available documents as well,
-which we did not include in this project.
+but we did not include any of those in this project.
 
 The Czech Republic also had a larger time-frame of documents
 available, but the format would have been HTML documents for earlier
@@ -103,14 +190,14 @@ periods in the archive, where they had a link to the given period, but
 it was an empty directory. Ireland's stenographic protocols were
 uploaded with a consistent naming scheme, which in itself would not
 have been a problem, if the names have not had been consisted of the
-date of the session. In practice if meant a computationally rather
-expensive pattern matching with regular expressions in order to
-extract the URLs for the PDF files. Although this operation consumed
-more computing resources than generating the URLs according to a
-naming scheme, the overall bottleneck at this stage was the number of
-documents to download, bandwidth at the server's side and the fact
-that we could not implement a solution that can handle multiple
-asynchronous downloads.
+date of the session and some constant value. In practice it meant a
+computationally rather expensive pattern matching with regular
+expressions in order to extract the URLs of the PDF files. Although
+this operation consumed more computing resources than generating the
+URLs according to a naming scheme, the overall bottleneck at this
+stage was the number of documents to download, bandwidth at the
+server's side and the fact that we could not implement a solution that
+can handle multiple asynchronous downloads.
 
 The next part was extracting raw text from the documents. For this
 task, we used the pdftools package for R. The pdf_data function that
@@ -120,18 +207,18 @@ whether each word was at the end of a line. After some initial trial
 and error with figuring out each country's page layout, we were able
 to cut off page headers and footers, and pages which did not contain
 either one of the two. This was very practical, since title pages and
-tables of contents usually did not have headers (and
-footers). Removing any miscellaneous text followed, this was done
-through searching for the beginning and the end of each session, in
-each language this corresponded to the following forms: "The session
+tables of contents usually did not have headers (and footers).
+Removing any miscellaneous text followed, this was done by
+searching for the beginning and the end of each session, in each
+language this corresponded to the following forms: "The session
 started at ..." and "The session ended at ...". Only pages between
-these two terms did we retain. Contrary to DOC, HTML and other
+these two terms did we retain. Contrary to DOC, HTML and similar
 document formats, text extracted from PDF documents remains
-hyphenated. This meant that unhyphenating the text was essential in
-preparing the raw data to train LDA models on it. This step was done
+hyphenated. This meant that unhyphenating the text was essential to
+prepare the raw data to train LDA models on it. This step was done
 by concatenating every word at the end of a line with the first word
 fragment of the following line, if it ended with a hyphen. This
-procedure however, resulted in too long lines. Line breaks and any
+procedure however, resulted in lines too long. Line breaks and any
 unnecessary whitespace was removed next, as we did not need the
 information of what each token's line number is. In order to obtain
 cleaner results and to be on a par with the shorter HTML documents,
@@ -142,7 +229,7 @@ tokens. Before this final step, many of them would have been more than
 Extracting raw text from the PDF documents was generally a
 straightforward process except for Belgium. The most notable
 difference was that being a bilingual country, they offer their
-protocols in a bilingual format, where each language is either on the
+minutes in a bilingual format, where each language is either on the
 left or right side of the page. This would not have been a problem, if
 the languages were always on the same side. This became obvious only
 as we started to expand our initially rather small amount of data to
@@ -151,34 +238,36 @@ to concerns about lemma stemming, which we decided not to apply to our
 data at all. This however, needed us increasing the amount of data at
 hand. At the beginning only one period's documents were downloaded
 from Belgium, where the sides for each language were consistent, but
-this consistency changed as we introduced data from previous
+this consistency changed as we introduced data from earlier
 periods. We thought of multiple implementations to tackle this
 problem, for example we had an observation, that even numbered
 legislature periods tended to have French text on the right side, but
 this was not always true, and it was unreliable to the point, that
-many of the topics in the LDA topic model were in fact not in French,
-but Dutch. In short, we were not satisfied with this approach. Later
-on, we settled on an implementation, where the program checked each
-document (e.g. 3rd period, Session no. 30., left side) whether it was
-written in Dutch or French. Although this approach was computationally
-more expensive than sheer guessing, because it checked the probability
-of the possible languages for each document by searching for stop
-words, this method turned out to work very accurately. We still ended
-up not being able to use the first period's documents, since the
-languages were not separated to either side, but intermingled as a
-sentence-by-sentence translation, which in some cases became
-paragraph-by-paragraph translation, or in extreme cases some text was
-not translated at all.
+using this method, many of the topics in the LDA topic model were in
+fact not in French, but Dutch. In short, we were not satisfied with
+this approach. Later on, we settled on an implementation, where the
+program checked each document (e.g. 3rd period, Session no. 30., left
+side) whether it was written in Dutch or French. Although this
+approach was computationally more expensive than sheer guessing,
+because it checked the probability of the possible languages for each
+document by searching for stop words, this method turned out to work
+very accurately. We still ended up not being able to use the first
+period's documents, since the languages were not separated to either
+side, but intermingled as a sentence-by-sentence translation, which in
+some cases became paragraph-by-paragraph translation, or in extreme
+cases some text was not translated at all. For the analysis, we used
+only the French part of the text, since in theory it has the same
+content as the Dutch part.
 
 After extracting the text from the PDF documents, we collected the
 resulting text files into one JSON file for each country, which were
 then used to created the document term matrices.
 
 The challenge with HTML countries was that they did not always have an
-easily understandable URL naming schema, and that the sessions were
+easily understandable URL naming scheme and that the sessions were
 not on one page but scattered through multiple HTML documents. For
 example debates from Poland were scattered through the websites of
-individual politicians, which had to be concatenated to get full
+individual politicians, which had to be then concatenated to get full
 debates.
 
 The following table summarizes the amount of data we were able to
