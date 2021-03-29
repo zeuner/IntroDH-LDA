@@ -12,7 +12,7 @@ source("spatial.R")
 polygon_data_frame <- map2spatial_polygons_data_frame(worldmap)
 
 plot_country_pie_map <- function (country, topics = NA, countries = NA) {
-    png(paste0(country, "-pies.png"), width = 4096, height = 4096)
+    png(paste0(country, "-pies-selection.png"), width = 4096, height = 4096)
     plot(polygon_data_frame)
     text(
         x = 0,
@@ -92,16 +92,10 @@ plot_country_pie_map <- function (country, topics = NA, countries = NA) {
 
 map(
     c(
-        "austria",
-        "belgium",
-        "czechia",
-        "france",
-        "hungary",
-        "ireland",
-        "italy",
-        "netherlands",
-        "poland",
-        "spain"
+        "austria"
     ),
-    plot_country_pie_map
+    partial(
+        plot_country_pie_map,
+        topics = c("t_18", "t_46", "t_50")
+    )
 )
