@@ -105,7 +105,7 @@ analyze_country <- function (country_name) {
         dtm <- CreateDtm(
             doc_vec = frame$data,
             doc_names = frame$id,
-            ngram_window = c(1, 1),
+            ngram_window = c(1, 2),
             stopword_vec = c(
                 country_stopwords(
                     country_name
