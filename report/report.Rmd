@@ -151,7 +151,17 @@ documents. Categorising them into one or the other group helped
 deciding how to approach downloading the data. The PDF documents were
 usually longer than their HTML counterparts, consisting of everything
 that happened in one session, which in most cases corresponds to one
-day. The first country for which we downloaded PDF documents was
+day.
+
+Some countries, for example the Netherlands, offered both HTML-based
+and PDF-based protocols, and not necessarily for the same data. In
+order to be able to work on all the selected countries while still
+taking into account the limited time available for the project, for
+each country only one type of protocols was selected.
+
+## PDF-based data
+
+The first country for which we downloaded PDF documents was
 Hungary, mainly for two reasons, the first being familiarity with the
 language and the second was the convenience of downloading. As none of
 the archives has a button to download everything, we had to write
@@ -177,8 +187,8 @@ in this regard were Belgium, The Czech Republic, Spain and Italy.
 
 Although there are more documents available for download from Austria,
 documents that were created earlier than what we decided to work with
-were not created using the PDF format, they were mostly scanned documents with
-inconsistent formatting. Including these documents would have been
+were not initially created as PDF files, they were mostly scanned documents
+with inconsistent formatting. Including these documents would have been
 possible by implementing optical character recognition, but the size and
 time-frame of the project did not allow us to explore every possible
 document. It is also worth to mention, that in order to better
@@ -267,12 +277,38 @@ After extracting the text from the PDF documents, we collected the
 resulting text files into one JSON file for each country, which were
 then used to created the document term matrices.
 
-The challenge with HTML countries was that they did not always have an
-easily understandable URL naming scheme and that the sessions were
-not on one page but scattered through multiple HTML documents. For
-example debates from Poland were scattered through the websites of
-individual politicians, which had to be then concatenated to get full
-debates.
+## HTML-based data
+
+For HTML-based protocols, the raw data contained more semantic structure
+in comparison with the PDF format that focuses mostly on how the content
+is displayed. This led both to opportunities and challenges.
+
+On the one hand, it was often easier to distinguish given debate items
+from the complete parliament meeting protocols. For the Netherlands and
+France, the protocols could be split based on specific HTML elements or
+attributes that always occurred at the beginning of a debate item,
+and only there. For Poland, there was even a single web page for every
+speech, so individual debate items had to be concatenated from multiple
+pages after identifying the debate item for each of the pages.
+
+On the other hand, focusing on the semantic structure without the
+parliaments using a common standard for this, much of the logic had
+to be written individually for each country. In case of Poland,
+there were even two different archive servers that applied a different
+structure to the data, and had to be tackled individually. Furthermore,
+the representation of the debates as multiple speech pages for Poland
+led to a huge amount of individual web pages to be downloaded.
+
+After extracting the structure from the raw HTML data and assigning
+the HTML lines to debate items, getting the actual text was usually
+straightforward because it could be achieved by stripping off the
+HTML tags.
+
+As with the PDF based protocols, the resulting data was exported
+to JSON files in order to have a common data format for further
+processing.
+
+## Results
 
 The following table summarizes the amount of data we were able to
 gather for this project.
@@ -392,6 +428,17 @@ results and visualizaion.)
 - word clouds
 
 # Conclusion
+
+# Future work
+
+## Data completeness
+
+Future work could concentrate on trying to make the available data for each
+country more comprehensive, for example by processing both HTML and PDF
+protocols where they are available. This would require strategies for
+deduplicating the data. It would enable more detailed analyses of specific
+time intervals when it can be ensured that there is data from all the
+countries for the chosen time interval.
 
 # Remarks
 
