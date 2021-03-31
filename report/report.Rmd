@@ -2,8 +2,11 @@
 output:
   pdf_document:
     highlight: tango
+    citation_package: biblatex
     number_sections: true
 documentclass: scrartcl
+bibliography: report.bib
+biblio-style: authoryear
 header-includes:
   - \usepackage{setspace}
   - \onehalfspacing
@@ -205,7 +208,8 @@ server's side and the fact that we could not implement a solution that
 can handle multiple asynchronous downloads.
 
 The next part was extracting raw text from the documents. For this
-task, we used the pdftools package for R. The pdf_data function that
+task, we used the pdftools[@libpdftools] package for R[@Rcore]. The
+`pdf_data` function that
 ships with it is able to extract text from PDF documents word by word,
 while retaining metadata such as x and y coordinates for each word and
 whether each word was at the end of a line. After some initial trial
@@ -299,7 +303,8 @@ gather for this project.
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
 it. We first created document term matrices, where stop words
-shipped with the SnowballC package were removed, and lemmas were
+shipped with the SnowballC[@libSnowballC] package were removed, and
+lemmas were
 normalized using hunspell. After training the model on these matrices,
 we began to notice multiple problems with this approach. The first
 problem was that nearly all topics had similar top terms. These were
@@ -315,7 +320,8 @@ from the data.
 
 During our research, we learnt that lemma stemming can also introduce
 anomalies into the results. As Thomas Köntges pointed out in his
-article[^1], increasing the data volume helps to maintain accuracy
+article[@UBHD-68613810],
+increasing the data volume helps to maintain accuracy
 when removing the lemma stemming step from the analysis. We needed to
 increase the data volume, since most of the languages we worked with
 have a higher morphological complexity than English. We had collected
@@ -392,6 +398,3 @@ results and visualizaion.)
 # References
 
 e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
-
-[^1]: Thomas Köntges: *Measusing Philosophy in the First Thousand Years
-of Greek Literature*. In Digital Classics Online, 2020. P. 1--23.
