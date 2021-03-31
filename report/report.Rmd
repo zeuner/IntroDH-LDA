@@ -283,18 +283,18 @@ The following table summarizes the amount of data we were able to
 gather for this project.
 
 
-| Country            | No. of legislature periods | Time Range | Word Count          |
-|--------------------|----------------------------|------------|---------------------|
-| Austria            |                          6 | 1999--2019 | 51,722,689          |
-| Belgium            |                          5 | 1999--2019 | 22,356,325 (French) |
-| The Czech Republic |                          3 | 2010--2021 | 29,522,033          |
-| France             |                          ? |          ? | ?                   |
-| Hungary            |                          2 | 2014--2021 | 25,297,392          |
-| Ireland            |                          1 | 2016--2020 | 30,169,798          |
-| Italy              |                          1 | 2013--2018 | 43,483,753          |
-| The Netherlands    |                          ? |          ? | ?                   |
-| Poland             |                          ? |          ? | ?                   |
-| Spain              |                          5 | 2011--2021 | 19,491,066          |
+| Country            | No. of legislature periods | Time Range | Word Count           |
+|--------------------|----------------------------|------------|----------------------|
+| Austria            |                          6 | 1999--2019 |  51,722,689          |
+| Belgium            |                          5 | 1999--2019 |  22,356,325 (French) |
+| The Czech Republic |                          3 | 2010--2021 |  29,522,033          |
+| France             |                          1 | 2012--2021 |  32,155,168          |
+| Hungary            |                          2 | 2014--2021 |  25,297,392          |
+| Ireland            |                          1 | 2016--2020 |  30,169,798          |
+| Italy              |                          1 | 2013--2018 |  43,483,753          |
+| The Netherlands    |                          3 | 2014--2021 |  11,916,017          |
+| Poland             |                          9 | 1991--2021 | 116,433,805          |
+| Spain              |                          5 | 2011--2021 |  19,491,066          |
 
 # Analysis
 
