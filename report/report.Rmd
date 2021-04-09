@@ -440,6 +440,16 @@ deduplicating the data. It would enable more detailed analyses of specific
 time intervals when it can be ensured that there is data from all the
 countries for the chosen time interval.
 
+## Scalability
+
+The size of the text corpora, while enabling training of the LDA models without
+the need for morphological normalization, also limited what could be achieved
+using the available computing resources. In particular, due to the sequential
+nature of the LDA training algorithm, parallelization was of limited use.
+It could be researched whether algorithms adapted for parallelization,
+like Sparse Partially Collapsed MCMC[@magnusson2017sparse], could improve
+this situation.
+
 # Remarks
 
 # References
