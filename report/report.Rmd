@@ -429,7 +429,13 @@ For performance reasons, matching the search terms against the document
 terms was done using the document term matrices already computed for
 the topic modeling. Since the search terms might occur as inflected
 forms depending on the language, this step required morphological
-normalization using the Snowball stemmer[@libSnowballC]. It should be
+normalization using the Snowball stemmer[@libSnowballC]. With a stemming
+function $s$ and a country name consisting of $k$ words $w_{i}$,
+we count the words $w$ in the document where $s(w) = s(w_{i})$. Then,
+the word from the country name with the minimum matching word count
+is considered the frequency of the country name in the document.
+
+It should be
 mentioned that this approach is of limited accuracy. It can create false
 positives because the document term matrices lack information about the
 positions of the terms in the documents. For example, an English-language
