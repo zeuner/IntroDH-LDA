@@ -335,6 +335,8 @@ The narrowing of the topic raises a few problems that should be addressed here. 
 
 ## Method
 
+### Topic modeling
+
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
 it. We first created document term matrices, where stop words
@@ -387,6 +389,8 @@ our approach to analysis. Finally, as we increased the number of
 topics to 100, we stopped changing the parameters given to the
 algorithm and started to work more on the analysis.
 
+### Transnational relations
+
 Our first approach was to (manually) search for country names, city
 names or topics that had to do with other countries. All countries had
 references to Belgium, which we explained with the European Committee
@@ -409,19 +413,54 @@ trafficking across the Mediterranean.
 This manual searching however, is not reproducible, and it is easy to
 introduce our own biases coming from our knowledge of politics or lack
 thereof into the results. In order to avoid these negative effects, we
-opted for another approach.
+opted for another approach that also allows for pre-filtering nearly
+arbitary amounts of text in preparation for human research to be
+done subsequently.
 
-(Here comes Isidor's latest improvements for the analysis, including
+In order to gather references to other countries in a fully automated manner,
+they had to be found by matching the terms extracted from the documents.
+
+Terms to search for could be extracted from the data collected by the
+Wikipedia project. It has encyclopedia pages for every country in nearly
+every language, and it links them together through interlanguage links,
+which allowed for straightforward extraction from their HTML pages.
+
+For performance reasons, matching the search terms against the document
+terms was done using the document term matrices already computed for
+the topic modeling. Since the search terms might occur as inflected
+forms depending on the language, this step required morphological
+normalization using the Snowball stemmer[@libSnowballC]. It should be
+mentioned that this approach is of limited accuracy. It can create false
+positives because the document term matrices lack information about the
+positions of the terms in the documents. For example, an English-language
+text might be related to the country "South Africa" if it
+contains the terms "south" and "africa" which
+are both expected to also occur in other contexts. At the same time,
+the German-language translation "Südafrika" should be
+fairly unambiguous. This must be kept in mind when interpreting the results
+since it means that text corpora in different languages cannot be
+meaningfully compared to each other with respect to extracted country
+references. It is expected that this effect can be reduced by working
+with n-grams in the document term matrices. With increasing n, this
+is expected to lead to results comparable to a phrase search in a web
+search engine.
+
+(TODO: Here comes Isidor's latest improvements for the analysis, including
 results and visualizaion.)
+
+
+### Reporting and visualization
 
 ## Challenges
 
+TODO: narrative formulation
 - enormous computing resource (time, memory)
 - unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
 - languages that none of us speaks
 
 ## Results
 
+TODO: narrative formulation
 - excerpts from the results as a table representation of the data frames
 - statistics
 - word clouds
