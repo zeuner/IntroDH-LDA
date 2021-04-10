@@ -445,6 +445,11 @@ with n-grams in the document term matrices. With increasing n, this
 is expected to lead to results comparable to a phrase search in a web
 search engine.
 
+At this point, there is the topic modeling result that can be transformed to
+a matrix of document-topic frequencies, and a matrix of document-country
+frequencies. These can be combined to a topic-country matrix using a
+matrix cross-product.
+
 (TODO: Here comes Isidor's latest improvements for the analysis, including
 results and visualizaion.)
 
