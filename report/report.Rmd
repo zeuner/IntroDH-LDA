@@ -441,7 +441,7 @@ fairly unambiguous. This must be kept in mind when interpreting the results
 since it means that text corpora in different languages cannot be
 meaningfully compared to each other with respect to extracted country
 references. It is expected that this effect can be reduced by working
-with n-grams in the document term matrices. With increasing n, this
+with n-grams in the document term matrices. With increasing $n$, this
 is expected to lead to results comparable to a phrase search in a web
 search engine.
 
