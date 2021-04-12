@@ -469,6 +469,18 @@ TODO: narrative formulation
 - unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
 - languages that none of us speaks
 
+### Computing requirements
+
+In the process of continuously refining the analysis approach, it turned out
+that considerable computing resources are useful for performing this kind
+of analysis. For one text corpus, training an LDA model with 500 iterations
+required up to 2,7 GiB of virtual memory when the corpora were preprocessed
+using morphological normalization. Without morphological normalization,
+up to 8,0 GiB of virtual memory were required. Furthermore, one text
+corpus required up to 87 hours on a student laptop. Due to the high memory
+usage, possibilities for parallel processing of multiple text corpora
+were limited on commodity hardware.
+
 ## Results
 
 TODO: narrative formulation
