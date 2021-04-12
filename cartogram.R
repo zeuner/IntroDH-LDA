@@ -26,19 +26,19 @@ write_topic_cartogram <- function (topic, country_topics, country) {
     )
     world_polygons@data <- data.frame(
         world_polygons@data,
-        data$fraction[matched]
+        topic_fraction = data$fraction[matched]
     )
     world_polygons.carto <- quick.carto(
         world_polygons,
-        world_polygons$data.fraction.matched.
+        world_polygons$topic_fraction
     )
     values <- seq(
-        from = min(na.omit(world_polygons$data.fraction.matched.)),
-        to = max(na.omit(world_polygons$data.fraction.matched.)),
+        from = min(na.omit(world_polygons$topic_fraction)),
+        to = max(na.omit(world_polygons$topic_fraction)),
         length.out = 33
     )
     country_colours <- map(
-        world_polygons$data.fraction.matched.,
+        world_polygons$topic_fraction,
         function (value) {
             found <- which(values < value) %>% max
             if (is.infinite(found)) {
