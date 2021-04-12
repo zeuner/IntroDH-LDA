@@ -127,11 +127,11 @@ be. This meant a limitation in flexibility and experimentation in
 designing the models. In order to have more resources, we asked the
 computer science department if they could provide a suitable
 machine. This was not the case and the university computer centre did
-not have enough free space for us to work on their R cluster. One
+not have enough free space for us to work on their R-Studio servers. One
 possibility would have been to implement our modelling as a SLURM
-job. This would have been exciting, but since we had no experience
-with SLURM, the preparation would have been too time-consuming and
-probably beyond the scope of our project. So, we had to deal with this
+job to run on the URZ big data cluster. This would have been exciting,
+but since we had no experience with SLURM, we had to decide not to depend
+on this option. So, we had to deal with this
 technical limitation and adapt the objective accordingly.
 
 
