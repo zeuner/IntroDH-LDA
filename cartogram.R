@@ -12,6 +12,8 @@ source("spatial.R")
 
 colours <- colorRampPalette(c("navy", "deepskyblue"))(33)
 
+colours_top <- colorRampPalette(c("deepskyblue", "magenta"))(5)
+
 write_topic_cartogram <- function (topic, country_topics, country) {
     world_polygons <- map2spatial_polygons_data_frame(
         worldmap
@@ -49,6 +51,8 @@ write_topic_cartogram <- function (topic, country_topics, country) {
             colours[found]
         }
     ) %>% unlist
+    top_countries <- order(-world_polygons$topic_fraction)
+    country_colours[top_countries[length(colours_top) : 1]] <- colours_top
     png(paste0(country, "-", topic, ".png"), width = 1024, height = 1024)
     plot(
         world_polygons.carto,
