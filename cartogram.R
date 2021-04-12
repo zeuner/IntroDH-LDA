@@ -6,6 +6,7 @@
 
 library(textmineR)
 library(getcartr)
+library(UScensus2000)
 
 source("spatial.R")
 
@@ -26,11 +27,12 @@ write_topic_cartogram <- function (topic, country_topics, country) {
     )
     world_polygons@data <- data.frame(
         world_polygons@data,
-        topic_fraction = data$fraction[matched]
+        topic_fraction = data$fraction[matched],
+        topic_fraction_area = data$fraction[matched] * areaPoly(world_polygons)
     )
     world_polygons.carto <- quick.carto(
         world_polygons,
-        world_polygons$topic_fraction
+        world_polygons$topic_fraction_area
     )
     values <- seq(
         from = min(na.omit(world_polygons$topic_fraction)),
