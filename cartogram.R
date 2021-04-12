@@ -65,6 +65,15 @@ write_topic_cartogram <- function (topic, country_topics, country) {
             "'s parliament"
         )
     )
+    legend(
+        "bottom",
+        NULL,
+        row.names(world_polygons@data)[top_countries[length(colours_top) : 1]],
+        col = colours_top,
+        cex = 1.5,
+        lwd = 7,
+        lty = 1
+    )
     dev.off()
 }
 
