@@ -1,6 +1,6 @@
 ---
 output:
-  pdf_document:
+    bookdown::pdf_document2:
     highlight: tango
     citation_package: biblatex
     number_sections: true
@@ -373,21 +373,12 @@ during this step.
 
 As for the topic modelling algorithm, we started with 20 topics. Since
 many of the topics were not really topics but rather a collection of
-common words in a parliament, we increased the number of topics. These
-changes led to our problem with computing resources. Running the
-algorithm with the increased data set and increased topic number also
-increased computing time and memory usage. Since the algorithm is not
-parallelised, we could run several country's scripts at the same time,
-because the memory usage also allowed this. After the increase, this
-was not possible any more, even on multiple CPU systems, because
-increased memory usage usually did not allow to do so. This slowed
-down our progress significantly. For countries that had less data,
-running the algorithm took between 8 to 10 hours, for more data,
-it could take 2--3 days. Changing one parameter cost us from several days
-up to one week of computing time, in which we could not further improve
-our approach to analysis. Finally, as we increased the number of
-topics to 100, we stopped changing the parameters given to the
-algorithm and started to work more on the analysis.
+common words in a parliament, we increased the number of topics. This
+led to challenges regarding computational costs as described in
+section \@ref(computing-requirements). Consequently, as we increased
+the number of topics to 100, we stopped changing the parameters
+given to the algorithm and started to work more on the
+analysis.
 
 ### Transnational relations
 
@@ -469,7 +460,7 @@ TODO: narrative formulation
 - unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
 - languages that none of us speaks
 
-### Computing requirements
+### Computing requirements {#computing-requirements}
 
 In the process of continuously refining the analysis approach, it turned out
 that considerable computing resources are useful for performing this kind
@@ -478,8 +469,9 @@ of analysis. For one text corpus, training an LDA model with 100 topics for
 were preprocessed
 using morphological normalization. Without morphological normalization,
 up to 8,0 GiB of virtual memory were required. Furthermore, one text
-corpus required up to 87 hours on a student laptop, and could not
-be sped up by parallelization because of the iterative nature of the LDA
+corpus required between 8 and 87 hours depending on its size on a
+student laptop, and could not be sped up by parallelization because
+of the iterative nature of the LDA
 algorithm implemented in the textmineR[@libtextmineR] package.
 Due to the high memory
 usage, possibilities for parallel processing of multiple text corpora
