@@ -473,13 +473,27 @@ TODO: narrative formulation
 
 In the process of continuously refining the analysis approach, it turned out
 that considerable computing resources are useful for performing this kind
-of analysis. For one text corpus, training an LDA model with 500 iterations
-required up to 2,7 GiB of virtual memory when the corpora were preprocessed
+of analysis. For one text corpus, training an LDA model with 100 topics for
+500 iterations required up to 2,7 GiB of virtual memory when the corpora
+were preprocessed
 using morphological normalization. Without morphological normalization,
 up to 8,0 GiB of virtual memory were required. Furthermore, one text
-corpus required up to 87 hours on a student laptop. Due to the high memory
+corpus required up to 87 hours on a student laptop, and could not
+be sped up by parallelization because of the iterative nature of the LDA
+algorithm implemented in the textmineR[@libtextmineR] package.
+Due to the high memory
 usage, possibilities for parallel processing of multiple text corpora
-were limited on commodity hardware.
+were limited on commodity hardware. Consequently, the text corpora
+had to be processed mostly one after another, leading to a long running
+time for getting the results from changed LDA parameters.
+
+It is possible to cope with this challenge by making use of the university's
+scientific computing infrastructure. However, since we became aware of
+the high requirements late throughout
+the limited project handling time, and since it takes time to negotiate
+computing access and to implement the necessary configuration changes,
+we could only make limited use of this possibility. This should be considered
+as a valuable takeaway for future similar projects, though.
 
 ## Results
 
