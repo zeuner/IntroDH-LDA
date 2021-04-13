@@ -135,6 +135,8 @@ analyze_country <- function (country_name) {
         calc_r2 = TRUE,
         cpus = cpus_lda
     )
+    lda_file_pre <- paste0(country_name, "-lda-pre.Rds")
+    write_rds(model , file = lda_file_pre)
     model$top_terms <- GetTopTerms(phi = model$phi, M = 100)
     model$prevalence <- colSums(model$theta) / sum(model$theta) * 100
     model$labels <- LabelTopics(assignments = model$theta > 0.05, 
@@ -148,5 +150,7 @@ analyze_country <- function (country_name) {
                               paste(x, collapse = ", ")
                             }),
                             stringsAsFactors = FALSE)
-    return (list(dtm = dtm, model = model))
+    lda_file_post <- paste0(country_name, "-lda-post.Rds")
+    write_rds(model , file = lda_file_post)
+    return (list(dtm_file = dtm_cache_file, model_file = lda_file_post))
 }

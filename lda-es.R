@@ -7,7 +7,9 @@
 library(textmineR)
 source("lda-generic.R")
 
-model <- analyze_country("spain")$model
+model_file <- analyze_country("spain")$model_file
+
+model <- readRDS(model_file)
 
 write_rds(model , file="spain-lda.Rds")
 
