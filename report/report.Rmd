@@ -399,7 +399,7 @@ the number of topics to 100, we stopped changing the parameters
 given to the algorithm and started to work more on the
 analysis.
 
-### Transnational relations
+### Transnational relations {#country-references}
 
 Our first approach was to (manually) search for country names, city
 names or topics that had to do with other countries. All countries had
@@ -471,8 +471,58 @@ matrix cross-product.
 (TODO: Here comes Isidor's latest improvements for the analysis, including
 results and visualizaion.)
 
-
 ### Reporting and visualization
+
+For understanding what the different latent topics are about, the
+`LDAvis`[@libLDAvis] package proved very useful since it comes with
+a web-based interactive interface where different parameters can be
+quickly tested for their effect. However, for reporting purposes, it
+seemed preferable to calculate and plot the corresponding term relevance
+measure[@sievert-shirley-2014-ldavis] directly in R. This way, the
+plotted bar graphs would always be exactly reproducible from the data.
+
+For visualizing the computed correlations between latent topics and
+country references, working with a world map was envisioned, which
+was available from the `maps`[@libmaps] package. However, this would
+not map to the country reference data out of the box. On the one hand,
+the country names retrieved as described in section
+\@ref(country-references) mostly referred to sovereign states.
+On the other hand, the names in the map data referred to regions,
+which may or may not have outer sovereignty, or may even be subject
+of disputes between different countries. For the purpose of this project
+and under consideration of the limited timeframe, only a rather rough
+mapping could be created, which maps external territories to the
+corresponding countries without taking into account to what extent
+there may be partial outer sovereignty, and where regions with very
+complex or disputed territorial situation were left out. This does
+also mean that an unintended bias could not be avoided at this stage.
+But being careful is mandated anyway when interpreting the resulting
+data, since the text matching of country names does also not guarantee
+that the text actually referred to a sovereign country rather than
+a region with a similar name. To prepare the visualizations which
+were all required to work on the data referring to sovereign countries,
+a spatial polygons data structure was created from the world map using the
+`maptools`[@libmaptools] package and augmented with the region names
+mapped to countries.
+
+In order to get a visual overview over what latent topics show a clear
+correlation to particular countries, plotting pie charts on a world map
+seemed promising. An existing implementation of pie charts for geospatial
+data was available through the `marmap`[@libmarmap] package. It turned
+out that more than 200 countries relating to 100 topics, leading to
+more than 20,000 data points, was just too much information to be visualized
+on one map. In the end, a trade-off had to be implemented here where
+only a subset of the topics were plotted into the pie charts. To choose
+them, a matrix was computed which contained, for each country, the fractions
+of the individual topics when compared to the sum of all topics found in
+connection with that country. Here, a high fraction would mean that a
+topic was much more frequent than the other topics with respect to the
+particular country. So, the maximum over all countries, computed using
+the `Rfast`[@libRfast] package, would be high for a topic if there
+was at least one country where the topic exceeded the other topics
+considerably. By that logic, the top ten topics with respect to the
+maximum fraction were chosen to be visualized since they were
+expected to show most selectiveness with respect to different countries.
 
 ## Challenges
 
