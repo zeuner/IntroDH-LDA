@@ -5,6 +5,7 @@
 ## -------------------------------------------------------------------
 
 library(textmineR)
+library(Rfast)
 library(marmap)
 
 source("spatial.R")
@@ -28,6 +29,16 @@ plot_country_pie_map <- function (country, topics = NA, countries = NA) {
     centroids <- getSpPPolygonsLabptSlots(polygon_data_frame)
     country_topics <- readRDS(paste0(country, "-country-topics.rds"))
     processed_topics <- attributes(country_topics)$Dimnames[[2]]
+    if (is.numeric(topics)) {
+        country_topic_fractions <- country_topics / rowSums(country_topics)
+        top_topics <- -colMaxs(
+            as.matrix(country_topic_fractions),
+            value = TRUE
+        ) %>% order
+        topics <- attributes(country_topics)$Dimnames[[2]][
+            top_topics[1 : topics]
+        ]
+    }
     if (!is.na(topics)) {
         processed_topics <- intersect(processed_topics, topics)
     }
@@ -83,7 +94,7 @@ plot_country_pie_map <- function (country, topics = NA, countries = NA) {
         processed_topics,
         col = colours,
         cex = 5,
-        lwd = 7,
+        lwd = 25,
         lty = 1,
         ncol = 8
     )
@@ -103,5 +114,8 @@ map(
         "poland",
         "spain"
     ),
-    plot_country_pie_map
+    partial(
+        plot_country_pie_map,
+        topics = 10
+    )
 )
