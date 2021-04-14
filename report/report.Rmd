@@ -485,7 +485,7 @@ the high requirements late throughout
 the limited project handling time, and since it takes time to negotiate
 computing access and to implement the necessary configuration changes,
 we could only make limited use of this possibility. This should be considered
-as a valuable takeaway for future similar projects, though.
+as a valuable insight for future similar projects, though.
 
 ## Results
 
