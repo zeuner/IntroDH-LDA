@@ -213,7 +213,7 @@ server's side and the fact that we could not implement a solution that
 can handle multiple asynchronous downloads.
 
 The next part was extracting raw text from the documents. For this
-task, we used the pdftools[@libpdftools] package for R[@Rcore]. The
+task, we used the `pdftools`[@libpdftools] package for R[@Rcore]. The
 `pdf_data` function that
 ships with it is able to extract text from PDF documents word by word,
 while retaining metadata such as x and y coordinates for each word and
@@ -264,7 +264,8 @@ program checked each document (e.g. 3rd period, Session no. 30., left
 side) whether it was written in Dutch or French. Although this
 approach was computationally more expensive than sheer guessing,
 because it checked the probability of the possible languages for each
-document by searching for stop words, this method turned out to work
+document by tokenizing it using the `koRpus`[@libkoRpus] package and
+searching for stop words, this method turned out to work
 very accurately. We still ended up not being able to use the first
 period's documents, since the languages were not separated to either
 side, but intermingled as a sentence-by-sentence translation, which in
@@ -274,7 +275,8 @@ only the French part of the text, since in theory it has the same
 content as the Dutch part.
 
 After extracting the text from the PDF documents, we collected the
-resulting text files into one JSON file for each country, which were
+resulting text files into one JSON file for each country using
+the `jsonlite`[@libjsonlite] package, which were
 then used to created the document term matrices.
 
 ## HTML-based data
@@ -297,7 +299,12 @@ to be written individually for each country. In case of Poland,
 there were even two different archive servers that applied a different
 structure to the data, and had to be tackled individually. Furthermore,
 the representation of the debates as multiple speech pages for Poland
-led to a huge amount of individual web pages to be downloaded.
+led to a huge amount of individual web pages to be downloaded. Since
+every individual web page to download meant another transaction that
+could eventually fail, basic caching of already fetched web pages was
+implemented so subsequent runs would not need to fetch them again.
+Using the `digest`[@libdigest] library, every URL was assigned a
+cache filename supposed to be unique under reasonable assumptions.
 
 After extracting the structure from the raw HTML data and assigning
 the HTML lines to debate items, getting the actual text was usually
@@ -340,7 +347,7 @@ The narrowing of the topic raises a few problems that should be addressed here. 
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
 it. We first created document term matrices, where stop words
-shipped with the SnowballC[@libSnowballC] package were removed, and
+shipped with the `SnowballC`[@libSnowballC] package were removed, and
 lemmas were
 normalized using hunspell. After training the model on these matrices,
 we began to notice multiple problems with this approach. The first
@@ -414,7 +421,9 @@ they had to be found by matching the terms extracted from the documents.
 Terms to search for could be extracted from the data collected by the
 Wikipedia project. It has encyclopedia pages for every country in nearly
 every language, and it links them together through interlanguage links,
-which allowed for straightforward extraction from their HTML pages.
+which allowed for straightforward extraction of the multi-language
+translations from the HTML pages, and of the country names directly
+from the URLs using the `urltools`[@liburltools] package.
 
 For performance reasons, matching the search terms against the document
 terms was done using the document term matrices already computed for
@@ -472,7 +481,7 @@ up to 8,0 GiB of virtual memory were required. Furthermore, one text
 corpus required between 8 and 87 hours depending on its size on a
 student laptop, and could not be sped up by parallelization because
 of the iterative nature of the LDA
-algorithm implemented in the textmineR[@libtextmineR] package.
+algorithm implemented in the `textmineR`[@libtextmineR] package.
 Due to the high memory
 usage, possibilities for parallel processing of multiple text corpora
 were limited on commodity hardware. Consequently, the text corpora
