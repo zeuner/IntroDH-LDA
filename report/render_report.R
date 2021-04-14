@@ -1,3 +1,3 @@
 library(rmarkdown)
 library(bookdown)
-render("report.Rmd", output_format="pdf_document2")
+render("report.Rmd", pdf_document2(toc = FALSE))
