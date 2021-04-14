@@ -159,7 +159,7 @@ order to be able to work on all the selected countries while still
 taking into account the limited time available for the project, for
 each country only one type of protocols was selected.
 
-## PDF-based data
+## PDF-based data {#pdf-scraping}
 
 The first country for which we downloaded PDF documents was
 Hungary, mainly for two reasons, the first being familiarity with the
@@ -344,12 +344,24 @@ The narrowing of the topic raises a few problems that should be addressed here. 
 
 ### Topic modeling
 
+In contrast to the highly diverse situation in the data acquisition step,
+in the analysis part the idea was that the different text corpora should
+be handled as uniformly as possible, with handling differences being mostly
+limited to the different languages. So, the functions were implemented
+to work on all the countries, with all remaining differences being stored
+in a hash table created using the `hash`[@libhash] package. It turned out
+that it was sufficient to differentiate language and country codes and
+the source for the stopword list since some languages were not
+represented in the `SnowballC`[@libSnowballC] package, while others
+were missing in the lists from the `stopwords`[@libstopwords] package.
+
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
 it. We first created document term matrices, where stop words
 shipped with the `SnowballC`[@libSnowballC] package were removed, and
 lemmas were
-normalized using hunspell. After training the model on these matrices,
+normalized using `hunspell`[@libhunspell]. After training the model
+on these matrices,
 we began to notice multiple problems with this approach. The first
 problem was that nearly all topics had similar top terms. These were
 not stop words in the traditional sense, but nevertheless
@@ -375,8 +387,8 @@ in the analysis we decided to include more legislation periods, so we
 went back to the data acquisition part to get more data. Also at this
 time, we decided to cut long documents into shorter parts, which had
 us modify the scraper scripts accordingly. The difficulty with
-Belgium's parliamentary minutes mentioned in point 3 became obvious
-during this step.
+Belgium's parliamentary protocols mentioned in section \@ref(pdf-scraping)
+became obvious during this step.
 
 As for the topic modelling algorithm, we started with 20 topics. Since
 many of the topics were not really topics but rather a collection of
