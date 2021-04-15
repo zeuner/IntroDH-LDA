@@ -12,7 +12,7 @@ source("spatial.R")
 
 colours <- colorRampPalette(c("navy", "deepskyblue"))(33)
 
-colours_top <- colorRampPalette(c("deepskyblue", "magenta"))(5)
+colours_top <- colorRampPalette(c("deepskyblue", "magenta", "yellow"))(10)
 
 write_topic_cartogram <- function (topic, country_topics, country) {
     world_polygons <- map2spatial_polygons_data_frame(
@@ -70,8 +70,8 @@ write_topic_cartogram <- function (topic, country_topics, country) {
         NULL,
         row.names(world_polygons@data)[top_countries[length(colours_top) : 1]],
         col = colours_top,
-        cex = 1.5,
-        lwd = 7,
+        cex = 1.2,
+        lwd = 5,
         lty = 1,
         plot = FALSE
     )
@@ -80,8 +80,8 @@ write_topic_cartogram <- function (topic, country_topics, country) {
         y = pos$rect$top,
         row.names(world_polygons@data)[top_countries[length(colours_top) : 1]],
         col = colours_top,
-        cex = 1.5,
-        lwd = 7,
+        cex = 1.2,
+        lwd = 5,
         lty = 1
     )
     dev.off()
