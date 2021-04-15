@@ -568,10 +568,20 @@ allows for automatically updated in-document references to other sections.
 
 ## Challenges
 
-TODO: narrative formulation
-- enormous computing resource (time, memory)
-- unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
-- languages that none of us speaks
+### Unfamiliarity with LDA topic modeling
+
+The project participants did not have previous practical experiences with LDA
+topic modeling. Also, there was only very limited previous knowledge of the
+theoretical background of LDA topic modeling. This led to a situation where
+a fair part of reasonable practises for processing a project like this
+had to be learned the hard way. Especially when it comes to the inner
+workings of the training algorithm and its characteristics regarding
+computational complexity, a some of the challenges described in the following
+section \@ref(computing-requirements) might have been possibly to handle
+earlier or more effectively if this had not been the case. However,
+disregarding what could have been achieved result-wise with more previous
+knowledge, this could actually be considered as a positive outcome from
+a learners' perspective.
 
 ### Computing requirements {#computing-requirements}
 
@@ -606,6 +616,21 @@ that is relevant for similar projects is that while they are much more scalable
 than the hardware that could be used before, one hard limitation is the per-node
 memory size which can still restrict what can be achieved with large text
 corpora when including n-gram terms.
+
+### Language proficiency
+
+The project included text corpora in languages that none of the participants
+could speak, and where also passive understanding was limited. On the one hand,
+this showed how effective the algorithmic prefiltering of the huge text corpora
+was, considering that with this level of language proficiency, it would have
+been completely out of reach to even consider looking for transnational
+references with foreign language debates. On the other hand, trying to
+interpret the results made it very clear that it is still hard to extract
+any conclusions without enough understanding of the language. It is often
+possible to look at the relevant terms from a topic and figure out what
+it might be about using a dictionary. But to verify any suspected
+transnational relationship, it is necessary to be able to read an excerpt
+of the raw parliamentary protocols.
 
 ## Results
 
