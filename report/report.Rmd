@@ -468,9 +468,6 @@ a matrix of document-topic frequencies, and a matrix of document-country
 frequencies. These can be combined to a topic-country matrix using a
 matrix cross-product.
 
-(TODO: Here comes Isidor's latest improvements for the analysis, including
-results and visualizaion.)
-
 ### Reporting and visualization
 
 For understanding what the different latent topics are about, the
@@ -538,7 +535,7 @@ and all big countries smaller. Instead, in order to achieve a map distortion
 relative to the original country areas, the mapping variable had to be
 multiplied by the factor of the original country area in the mercator
 projection. This could be computed from the spatial polygons using the
-`UScensus2000`[@UScensus2000] package. This way, someone who is used to
+`UScensus2000`[@libUScensus2000] package. This way, someone who is used to
 how the world map looks like in the mercator projection would see where
 the map differs. The downside is that countries which have a very small
 land area are hardly noticeable on the cartogram no matter how focused
