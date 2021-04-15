@@ -541,6 +541,14 @@ the map differs. The downside is that countries which have a very small
 land area are hardly noticeable on the cartogram no matter how focused
 the topic is on them.
 
+Finally, even for writing the project report itself, the project
+infrastructure based on the R language proved useful. Using the
+`rmarkdown`[@librmarkdown] package, the report including embedded
+visualizations could be written mostly in markdown syntax and then
+rendered to a PDF document. This way, the report document could easily
+be updated based on new visualizations created from the data. Later
+it turned out that using the `bookdown`[@libbookdown] package even
+allows for automatically updated in-document references to other sections.
 
 ## Challenges
 
