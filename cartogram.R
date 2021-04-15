@@ -53,7 +53,7 @@ write_topic_cartogram <- function (topic, country_topics, country) {
     ) %>% unlist
     top_countries <- order(-world_polygons$topic_fraction)
     country_colours[top_countries[length(colours_top) : 1]] <- colours_top
-    png(paste0(country, "-", topic, ".png"), width = 1024, height = 1024)
+    png(paste0(country, "-", topic, ".png"), width = 1024, height = 576)
     plot(
         world_polygons.carto,
         col = country_colours,
@@ -65,9 +65,19 @@ write_topic_cartogram <- function (topic, country_topics, country) {
             "'s parliament"
         )
     )
-    legend(
-        "bottom",
+    pos <- legend(
+        "bottomleft",
         NULL,
+        row.names(world_polygons@data)[top_countries[length(colours_top) : 1]],
+        col = colours_top,
+        cex = 1.5,
+        lwd = 7,
+        lty = 1,
+        plot = FALSE
+    )
+    legend(
+        x = pos$rect$left,
+        y = pos$rect$top,
         row.names(world_polygons@data)[top_countries[length(colours_top) : 1]],
         col = colours_top,
         cex = 1.5,
