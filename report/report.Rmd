@@ -161,6 +161,16 @@ each country only one type of protocols was selected.
 
 ## PDF-based data {#pdf-scraping}
 
+The first completely working data acquisition workflow was for PDF-based
+protocols. Because of this, the PDF downloading and processing was also
+the part that set the standard for how many other parts of the project
+should work. After some quick thoughts about possible options, it was
+soon agreed upon to use the R language[@Rcore] for all parts of the
+project since all project participants were to some extent familiar with
+it. Also, the `tidyverse`[@libtidyverse] proved useful here due to
+the functions it provides to conveniently do repetitive tasks on large
+data sets.
+
 The first country for which we downloaded PDF documents was
 Hungary, mainly for two reasons, the first being familiarity with the
 language and the second was the convenience of downloading. As none of
@@ -305,11 +315,16 @@ could eventually fail, basic caching of already fetched web pages was
 implemented so subsequent runs would not need to fetch them again.
 Using the `digest`[@libdigest] library, every URL was assigned a
 cache filename supposed to be unique under reasonable assumptions.
+For the protocols of the Netherlands, there was no hierarchical
+web page structure linking down to each protocol, so the chronologically
+linked pages had to be iterated through. For doing so, linked list logic
+from the `rlist`[@librlist] package proved useful.
 
 After extracting the structure from the raw HTML data and assigning
 the HTML lines to debate items, getting the actual text was usually
 straightforward because it could be achieved by stripping off the
-HTML tags.
+HTML tags and converting HTML entities to their UTF-8 counterpart
+by use of the `xml2`[@libxml2] package.
 
 As with the PDF based protocols, the resulting data was exported
 to JSON files in order to have a common data format for further
@@ -357,7 +372,8 @@ were missing in the lists from the `stopwords`[@libstopwords] package.
 
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
-it. We first created document term matrices, where stop words
+it. We first loaded the text corpora using the `readr`[@libreadr] package and
+created document term matrices, where stop words
 shipped with the `SnowballC`[@libSnowballC] package were removed, and
 lemmas were
 normalized using `hunspell`[@libhunspell]. After training the model
@@ -387,7 +403,7 @@ in the analysis we decided to include more legislation periods, so we
 went back to the data acquisition part to get more data. Also at this
 time, we decided to cut long documents into shorter parts, which had
 us modify the scraper scripts accordingly. The difficulty with
-Belgium's parliamentary protocols mentioned in section \@ref(pdf-scraping)
+Belgium's parliamentary minutes mentioned in section \@ref(pdf-scraping)
 became obvious during this step.
 
 As for the topic modelling algorithm, we started with 20 topics. Since
