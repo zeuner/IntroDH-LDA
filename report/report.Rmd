@@ -524,6 +524,27 @@ considerably. By that logic, the top ten topics with respect to the
 maximum fraction were chosen to be visualized since they were
 expected to show most selectiveness with respect to different countries.
 
+For a given topic, its correlation to different countries was visualized
+using a diffusion cartogram. To implement this, the `getcartr`[@libgetcartr]
+package could be used which provides an interface to compute a
+transformed map based on a mapping variable to substitute the land area
+for each spatial polygon. The idea was to have countries show up bigger
+on the map if they are related to the given topic more than on average,
+and to show up smaller if it happens less than on average. This meant that
+the mapping variable could not be proportional to the topic frequency
+itself since this would be, on average, in the same dimension for all
+countries, thereby regularly making all small countries show up bigger
+and all big countries smaller. Instead, in order to achieve a map distortion
+relative to the original country areas, the mapping variable had to be
+multiplied by the factor of the original country area in the mercator
+projection. This could be computed from the spatial polygons using the
+`UScensus2000`[@UScensus2000] package. This way, someone who is used to
+how the world map looks like in the mercator projection would see where
+the map differs. The downside is that countries which have a very small
+land area are hardly noticeable on the cartogram no matter how focused
+the topic is on them.
+
+
 ## Challenges
 
 TODO: narrative formulation
@@ -587,6 +608,20 @@ nature of the LDA training algorithm, parallelization was of limited use.
 It could be researched whether algorithms adapted for parallelization,
 like Sparse Partially Collapsed MCMC[@magnusson2017sparse], could improve
 this situation.
+
+## More appropriate visualizations
+
+It could be argued that while there may be topics that are geographic by
+their nature, thereby making maps or cartograms a fitting visualization,
+this is not really insightful for topics that do not have a connection to
+the countries' geography at all. For example, for the tax-related treaties
+of a country, issues like the possibly nested interdependence of companies
+across national borders is of greater importance than the size or location
+of the involved countries.
+
+An interesting option for future efforts may be network-style visualizations,
+although this might require more data cleanup or coverage of more
+countries' parliaments.
 
 # Remarks
 
