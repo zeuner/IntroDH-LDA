@@ -120,6 +120,7 @@ analyze_country <- function (country_name) {
         )
         saveRDS(dtm, file = dtm_cache_file)
     }
+    message("DTM complete")
 ## arbitrary seeding for reproducible output
     set.seed(12833)
     model <- FitLdaModel(
@@ -135,8 +136,10 @@ analyze_country <- function (country_name) {
         calc_r2 = TRUE,
         cpus = cpus_lda
     )
+    message("LDA model complete")
     lda_file_pre <- paste0(country_name, "-lda-pre.Rds")
     write_rds(model , file = lda_file_pre)
+    message("pre augmentation saving complete")
     model$top_terms <- GetTopTerms(phi = model$phi, M = 100)
     model$prevalence <- colSums(model$theta) / sum(model$theta) * 100
     model$labels <- LabelTopics(assignments = model$theta > 0.05, 
@@ -150,7 +153,9 @@ analyze_country <- function (country_name) {
                               paste(x, collapse = ", ")
                             }),
                             stringsAsFactors = FALSE)
+    message("metadata augmentation complete")
     lda_file_post <- paste0(country_name, "-lda-post.Rds")
     write_rds(model , file = lda_file_post)
+    message("post augmentation saving complete")
     return (list(dtm_file = dtm_cache_file, model_file = lda_file_post))
 }
