@@ -582,7 +582,14 @@ the high requirements late throughout
 the limited project handling time, and since it takes time to negotiate
 computing access and to implement the necessary configuration changes,
 we could only make limited use of this possibility. This should be considered
-as a valuable insight for future similar projects, though.
+as a valuable insight for future similar projects, where computing access
+should be negotiated from the beginning.
+
+One limitation even with the University's scientific computing resources
+that is relevant for similar projects is that while they are much more scalable
+than the hardware that could be used before, one hard limitation is the per-node
+memory size which can still restrict what can be achieved with large text
+corpora when including n-gram terms.
 
 ## Results
 
@@ -614,6 +621,21 @@ It could be researched whether algorithms adapted for parallelization,
 like Sparse Partially Collapsed MCMC[@magnusson2017sparse], could improve
 this situation.
 
+Furthermore, there are smaller technical issues that could be looked into
+in order to increase the technological reach of the software. One thing
+we noticed is that the exception handling of the R language does not work
+correctly when being wrapped in calls to `future_lapply` from the
+`future.apply`[@libfuture.apply] package, which is why we had to use
+serial counterparts of that function for code that should be parallelizable.
+Finding solutions for this issue could greatly cut down the time required
+at least for the data acquisition part. Also, it turned out that
+the `saveRDS` function we needed to persistently store results of expensive
+computations like the LDA model training can require considerably higher
+amounts of memory for serializing data structures that fit well into memory
+for a long time before the serialization takes place. If this situation could
+be improved, larger LDA models could be trained within existing memory
+constraints.
+
 ## More appropriate visualizations
 
 It could be argued that while there may be topics that are geographic by
@@ -628,8 +650,18 @@ An interesting option for future efforts may be network-style visualizations,
 although this might require more data cleanup or coverage of more
 countries' parliaments.
 
+# Acknowledgements
+
+We are thankful to Dr. Thomas Köntges who did not only provide us a great
+introduction to available methods before project start, but also with valuable
+pointers for handling the challenges we encountered throughout the project.
+
+Computations for this work were done in part using resources of the
+Leipzig University Computing Centre. Therefore, we are also thankful for
+getting computing access there.
+
 # Remarks
 
 # References
 
-e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
+TODO: e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
