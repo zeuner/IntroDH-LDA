@@ -642,11 +642,6 @@ of the raw parliamentary protocols.
 
 ## Results
 
-TODO: narrative formulation
-- excerpts from the results as a table representation of the data frames
-- statistics
-- word clouds
-
 Not surprisingly, between four and thirty years of parliamentary work
 in ten countries contains more information about transnational relations
 than what could possibly be presented in this report. But we will include
@@ -779,13 +774,60 @@ Vessel Personnel (STCW-F), where Palau was mentioned as having ratified
 the convention in 2011, thereby causing the convention to enter into force
 due to reaching the minimum threshold of signing countries. So, this
 would be a case where the country Palau showing up could be considered
-as incidental, considering that it does not have a special status when
+as coincidental, considering that it does not have a special status when
 compared to the other countries ratifying the convention.
 
 ![Cartogram for topic t_22 for Poland(\#fig:polandc22)](../poland-t_22.png)
 
+### Abortion laws
+
+When looking at topic 11 in the debates from Poland, terms (figure
+\@ref(fig:polandr11)) like "ciąża" (pregnancy), "aborcja" (abortion),
+"kobieta" (woman) or "dziecko" (child) make it reasonable to assume that
+it marks debates related to abortion laws. Since these are a controversial
+topic in Poland, it is not surprising that it has made it into a rather
+clear latent topic.
+
+![Terms for topic t_11 for Poland(\#fig:polandr11)](../poland-t_11-relevance.png)
+
+Considering that this is a matter of inner politics, it could be asked
+where the country references as seen in the cartogram (figure
+\@ref(fig:polandc11)) stem from. Looking at the corresponding debates,
+it can be seen that a lot of different countries are mentioned for
+comparison reasons because they have either more liberal or more strict
+policies on abortion than Poland. Sometimes there is also something said
+about the situation in these countries. So, these might not be considered
+transnational relations, but rather indications on how MPs in Poland view
+laws in other countries.
+
+![Cartogram for topic t_11 for Poland(\#fig:polandc11)](../poland-t_11.png)
+
+### Nuclear power {#hungary-nuclear}
+
+![Terms for topic t_22 for Hungary(\#fig:hungaryr22)](../hungary-t_22-relevance.png)
+
+![Cartogram for topic t_22 for Hungary(\#fig:hungaryc22)](../hungary-t_22.png)
+
+Topic 22 in the debates from Hungary show terms (figure \@ref(fig:hungaryr22))
+like "atomenergia" (nuclear energy) or "atomerőmű" (nuclear power plant),
+so the question arises whether this can be related to the manual findings
+about the nuclear power plant in Hungary in section \@ref(country-references).
+Indeed, Russia shows up predominantly in the cartogram for this topic
+(figure \@ref(fig:hungaryc22)). Costa Rica, which also shows up, however
+does so because it was mentioned as one country that committed itself to 100
+percent of renewable energy sources by 2021.
 
 # Conclusion
+
+The results drawn from this research could already make it obvious where
+the limitations of the approach lie. Countries are getting referenced
+in parliamentary debates for various reasons, and it is always necessary
+to re-check the results in order to find out whether they are actually
+caused by transnational relations. However, the approach could lead to
+various insightful findings that might have been hard to find by unguidedly
+reading through the debates. It remains to be shown how the approach compares
+to other ways of finding out about transnational relations, both with respect
+to efficiency and accuracy.
 
 # Future work
 
@@ -823,7 +865,7 @@ for a long time before the serialization takes place. If this situation could
 be improved, larger LDA models could be trained within existing memory
 constraints.
 
-## More appropriate visualizations
+## Rethinking visualizations
 
 It could be argued that while there may be topics that are geographic by
 their nature, thereby making maps or cartograms a fitting visualization,
@@ -836,6 +878,64 @@ of the involved countries.
 An interesting option for future efforts may be network-style visualizations,
 although this might require more data cleanup or coverage of more
 countries' parliaments.
+
+On the other hand, also further researching the full potential of the
+geospatial visualization strategy might prove interesting. Sometimes,
+these are insightful and probably hard to beat by other types of visualization.
+On Hungary's nuclear power topic (section \@ref(hungary-nuclear)), the
+whole African continent is shown conspicuously small. There are other
+situations where such visualizations might lead to interesting insights.
+For example, with very local matters, it could be expected that neighbouring
+countries look very big on a cartogram. This might be the case for
+COVID-19-related measures since they are often related to border situations,
+but we did not have sufficiently new data for all countries at this point.
+Another example might be maritime topics, for which it could be investigated
+whether they make countries with sea access look big more often.
+
+## Model training boundaries
+
+For this project, every parliament was processed as one training set for LDA
+modeling, and the resulting model was also only used on the texts from the
+same parliament. This provided for an artifical boundary between the models,
+with the effect of topics from different parliaments not being comparable
+to each other. Also, there is the natural boundary of languages, which
+was in addition responsible for country references not being comparable
+between parliaments.
+
+Other ways of approaching the research might be
+interesting, though. Models could also be created only for particular
+time intervals, possibly sharpening the lens for events from that time
+interval. On the other hand, models could be created based on the
+text collections from multiple parliaments using the same language,
+allowing an analysis on how country-topic correlations differ between
+two parliaments.
+
+On the other hand, multilingual text collections like that from Belgium
+might demand for tools which can do better than just excluding all but one
+language. Researching such possibilities might also lead to approaches that
+allow for comparative research of different parliaments using different
+languages.
+
+## Refining models
+
+Some anomalies in the country references might be possible to reduce
+by further researching good measures for their relevance to a topic.
+Also, the topic models themselves might become sharper by going
+beyond the bag-of-words model and including n-grams[@Wallach05topicmodeling].
+This could not be achieved throughout the project because the time
+after getting scientific computing access did not suffice to compute
+all models including bigrams.
+
+## Other state entities
+
+Depending on what kind of transnational relations are of interest, there
+might be better places to look than parliamentary debates. After all, in
+the fictional case where the existing legislation already works perfectly
+for a given kind of transnational relation, there might not be the need
+for any member of the legislation to ever look at it, even less debate it.
+But it would be possible that these show up in archives of certain ministries
+in the corresponding countries. If these are also openly accessible, similar
+methods might be applied.
 
 # Acknowledgements
 
