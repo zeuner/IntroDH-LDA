@@ -13,7 +13,7 @@ source("spatial.R")
 polygon_data_frame <- map2spatial_polygons_data_frame(worldmap)
 
 plot_country_pie_map <- function (country, topics = NA, countries = NA) {
-    png(paste0(country, "-pies.png"), width = 4096, height = 4096)
+    png(paste0(country, "-pies.png"), width = 4096, height = 2304)
     plot(polygon_data_frame)
     text(
         x = 0,
@@ -89,8 +89,8 @@ plot_country_pie_map <- function (country, topics = NA, countries = NA) {
         pie.radius = 3
     )
     legend(
-        -120,
-        -90,
+        "bottom",
+        NULL,
         processed_topics,
         col = colours,
         cex = 5,

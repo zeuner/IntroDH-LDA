@@ -39,7 +39,8 @@ Semester: WS 2020/2021
 
 Parliaments usually make corrected versions of their plenary minutes
 available for public inspection on the internet. The minutes contain
-the speeches of the MPs, reports and debates. These documents are
+the speeches of the members of the parliament (MPs), reports and debates.
+These documents are
 accessible to everybody, but the large amount of the documents makes
 it difficult to index and search. And it is even more difficult to
 recognise complex topics, connections and "between the lines"
@@ -482,9 +483,14 @@ search engine.
 At this point, there is the topic modeling result that can be transformed to
 a matrix of document-topic frequencies, and a matrix of document-country
 frequencies. These can be combined to a topic-country matrix using a
-matrix cross-product.
+matrix cross-product. Furthermore, the document-topic and document-country
+matrices can be used for retrieval of the documents related to a specific
+cell in the topic-country matrix. To do so, a ranking vector for all documents
+can be computed as the product of the column from the document-topic matrix
+corresponding to the topic, and the column from the document-country matrix
+corresponding to the country.
 
-### Reporting and visualization
+### Reporting and visualization {#visualization}
 
 For understanding what the different latent topics are about, the
 `LDAvis`[@libLDAvis] package proved very useful since it comes with
@@ -493,6 +499,8 @@ quickly tested for their effect. However, for reporting purposes, it
 seemed preferable to calculate and plot the corresponding term relevance
 measure[@sievert-shirley-2014-ldavis] directly in R. This way, the
 plotted bar graphs would always be exactly reproducible from the data.
+Parametrized with $\lambda = 0,6$, the most relevant terms for each topic
+usually allowed for some interpretation on what it is about.
 
 For visualizing the computed correlations between latent topics and
 country references, working with a world map was envisioned, which
@@ -638,6 +646,144 @@ TODO: narrative formulation
 - excerpts from the results as a table representation of the data frames
 - statistics
 - word clouds
+
+Not surprisingly, between four and thirty years of parliamentary work
+in ten countries contains more information about transnational relations
+than what could possibly be presented in this report. But we will include
+a selection of what we found during the project.
+
+### "Causa Kasachstan"
+
+As for all countries processed, we could create a pie chart map as described
+in section \@ref(visualization) as seen in figure \@ref(fig:austriapie).
+
+![Pie chart map for Austria(\#fig:austriapie)](../austria-pies.png)
+
+One of the ten topics identified here as being selective to one or a few
+countries is topic number 18, which has relevant terms as seen in figure
+\@ref(fig:austriar18).
+
+![Terms for topic t_18 for Austria(\#fig:austriar18)](../austria-t_18-relevance.png)
+
+Also, the topic cartogram as seen in figure \@ref(fig:austriac18) shows a
+strong focus on the country Kazakhstan.
+
+![Cartogram for topic t_18 for Austria(\#fig:austriac18)](../austria-t_18.png)
+
+Now, terms like "staatsanwaltschaft" (public prosecutor) or "ermittlung"
+(investigation) create the impression of a criminal investigation, which
+is usually a matter of the interior. So, a strong focus on another country
+seemed notable. And indeed, checking the protocol data for the cause
+did show something that could be considered significant. Much of what
+led to the indicators in the figures came from the stenographic protocol
+from the 11th December 2009 of the National Council of the Republic of
+Austria, containing in-depth discussions about the results from an
+investigation committee concerned with a transnational issue labelled
+"Causa Kasachstan" and related extradition demands.
+
+No doubt this is a transnational issue, however it concerns a single
+event that had to be handled, not necessarily a long-term relationship
+between the countries Austria and Kazakhstan.
+
+### Refugee politics
+
+Another topic from Austria's pie chart map, topic 46, shows various terms
+that can be associated with immigration and refugees
+(figure \@ref(fig:austriar46)), like "flüchtling" (refugee), "integration"
+(integration) or "asylverfahren" (asylum procedure).
+
+![Terms for topic t_46 for Austria(\#fig:austriar46)](../austria-t_46-relevance.png)
+
+Looking at the cartogram (figure \@ref(fig:austriac46)), various countries
+can be seen highlighted. It turns out that they got there due to different
+roles they have in the discussions that took place about refugee politics.
+For example, Eritrea and Gambia got mentioned because the MPs actually
+talked about people who immigrated to Austria from these countries.
+On the other hand, Papua New Guinea and Nauru got mentioned as examples
+for countries from which immigration to Australia takes place, thereby
+discussing Australia's refugee and immigration politics and its effects.
+Lesotho got mentioned for comparison reasons, because it was before
+Austria on the donor list of the World Food Programme at the time when
+the debate took place (4th July 2018).
+
+![Cartogram for topic t_46 for Austria(\#fig:austriac46)](../austria-t_46.png)
+
+From these examples, Eritrea and Gambia could be most likely considered
+as transnational relations. Papua New Guinea and Nauru would rather be
+relations of Australia. And it is interesting that Australia did not
+show up so prominently in the visualizations.
+
+### Debt crisis
+
+Another topic we looked at for Austria, although not visible on the
+pie chart map, was topic number 50. In the term relevance chart
+(figure \@ref(fig:austriar50)), the country "griechenland" (Greece) gets
+mentioned quite prominently, right after "bank" (bank). There
+is also "krise" (crisis) and "schulden" (debts). The obvious
+interpretation is that this latent topic covers Europe's debt crisis
+around 2010.
+
+![Terms for topic t_50 for Austria(\#fig:austriar50)](../austria-t_50-relevance.png)
+
+The corresponding cartogram in figure \@ref(fig:austriac50) highlights, among
+other countries, all Eurozone countries that required assistance of third
+parties in order to handle their responsibilities with respect to government
+debts or banks under national supervision within the debt crisis.
+
+![Cartogram for topic t_50 for Austria(\#fig:austriac50)](../austria-t_50.png)
+
+In the related parliamentary protocols, a lot of discussions regarding the
+implications of helping the indebted Eurozone member states can be found.
+
+### Galician sea workers
+
+![Terms for topic t_46 for Spain(\#fig:spainr46)](../spain-t_46-relevance.png)
+
+![Cartogram for topic t_46 for Spain(\#fig:spainc46)](../spain-t_46.png)
+
+One latent topic we looked at in the protocols from Spain was topic number 46.
+The relevant terms as seen in figure \@ref(fig:spainr46) suggest some focus
+on the autonomous community Galicia. Yet the cartogram (figure
+\@ref(fig:spainc46)) highlights Norway. The focus comes mostly from a
+protocol from the 21st February 2017 where the government was urged to
+take measures to protect the rights of Galician sea workers embarked on
+ships from the Kingdom of Norway until 1994.
+
+This topic is interesting because it shows that a transnational relationship,
+in this case sea workers being embarked on ships of another nation,
+can take more than 20 years to show up in the work of the parliament.
+
+### Treaties
+
+![Pie chart map for Poland(\#fig:polandpie)](../poland-pies.png)
+
+A topic found on the pie chart map for poland (figure \@ref(fig:polandpie))
+is topic number 22. According to the relevant terms
+(figure \@ref(fig:polandr22)), this one might be present in discussions
+about treaties due to the high relevance of terms like "ratifikacja"
+(ratification) or "umowa" (treaty).
+
+![Terms for topic t_22 for Poland(\#fig:polandr22)](../poland-t_22-relevance.png)
+
+The cartogram for that topic (figure \@ref(fig:polandc22)), or in case of
+small countries its legend, shows different countries. Since treaties between
+countries are a form of transnational relationship that will have a pretty
+direct impact on parliamentary work in many political systems, it could
+be expected that these will often be contracting parties of Poland. And
+indeed, this is often the case. We found that Grenada and Belize showed
+up because of draft laws for information exchange in tax matters between
+the countries and Poland. For Palau, no one-to-one relationship was the cause
+since the parliamentary protocol was about the International Convention
+on Standards of Training, Certification and Watchkeeping for Fishing
+Vessel Personnel (STCW-F), where Palau was mentioned as having ratified
+the convention in 2011, thereby causing the convention to enter into force
+due to reaching the minimum threshold of signing countries. So, this
+would be a case where the country Palau showing up could be considered
+as incidental, considering that it does not have a special status when
+compared to the other countries ratifying the convention.
+
+![Cartogram for topic t_22 for Poland(\#fig:polandc22)](../poland-t_22.png)
+
 
 # Conclusion
 

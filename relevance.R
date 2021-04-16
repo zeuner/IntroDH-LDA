@@ -17,12 +17,17 @@ plot_relevant_terms <- function (country) {
         lambda * log(phi) + (1 - lambda) * log(phi / colSums(phi))
     )
     for (topic in dimnames(relevance)[[1]]) {
-        png(paste0(country, "-", topic, "-relevance.png"))
+        png(
+            paste0(country, "-", topic, "-relevance.png"),
+            width = 1024,
+            height = 576
+        )
         par(mai = c(0.7, 2, 0.3, 0.5))
         barplot(
             relevance[topic,] %>% sort %>% tail(n = 15),
             horiz = TRUE,
-            las = 2
+            las = 2,
+            cex.names = 1.2
         )
         dev.off()
     }
