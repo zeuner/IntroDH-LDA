@@ -5,7 +5,6 @@
 ## For license see: https://mit-license.org
 ## -------------------------------------------------------------------
 
-library(tidytext)
 library(tidyverse)
 library(hunspell)
 library(pdftools)
