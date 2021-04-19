@@ -32,13 +32,22 @@ compute_country_references <- function (country) {
         stem_preserving
     ) %>% unlist
     for (country_id in 1:length(country_names$name_en)) {
-        country_words <- country_names[[
-            paste0("name_", settings$language)
-        ]][[country_id]] %>% str_split(" ") %>% map(
-            tolower
-        ) %>% unlist %>% setdiff(
-            y = country_stopwords(country)
-        ) %>% map(
+        country_name_dtm <- CreateDtm(
+            doc_vec = country_names[[
+                paste0("name_", settings$language)
+            ]][[country_id]],
+            ngram_window = c(1, 1),
+            stopword_vec = c(
+                country_stopwords(
+                    country
+                )
+            ),
+            lower = TRUE,
+            remove_punctuation = TRUE,
+            remove_numbers = TRUE,
+            verbose = FALSE
+        )
+        country_words <- attributes(country_name_dtm)$Dimnames[[2]] %>% map(
             stem_preserving
         ) %>% unlist
         word_stem_documents <- function (stem) {
