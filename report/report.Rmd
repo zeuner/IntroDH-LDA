@@ -135,7 +135,7 @@ but since we had no experience with SLURM, we decided not to depend on this
 option, and prepare the report so it could be finished without needing
 more computing power. Although we could actually get cluster access in the
 end, the conclusions gained there were more technical in nature (see section
-\@ref(computing-requirements).
+\@ref(computing-requirements)).
 
 
 # Data Acquisition
