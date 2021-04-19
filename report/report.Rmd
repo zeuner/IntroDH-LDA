@@ -21,7 +21,7 @@ fontsize: 12pt
 {\bfseries\huge Analysing Transnational Relationships in Parliament Debates \par}
 \vspace{1cm}
 {\large Agoston Volcz, Jonathan Weinmann, Isidor Zeuner \par
-March 14. 2021}
+April 19. 2021}
 
 \vfill
 Fakultät für Mathematik und Informatik \\
@@ -131,9 +131,11 @@ machine. This was not the case and the university computer centre did
 not have enough free space for us to work on their R-Studio servers. One
 possibility would have been to implement our modelling as a SLURM
 job to run on the URZ big data cluster. This would have been exciting,
-but since we had no experience with SLURM, we had to decide not to depend
-on this option. So, we had to deal with this
-technical limitation and adapt the objective accordingly.
+but since we had no experience with SLURM, we decided not to depend on this
+option, and prepare the report so it could be finished without needing
+more computing power. Although we could actually get cluster access in the
+end, the conclusions gained there were more technical in nature (see section
+\@ref(computing-requirements).
 
 
 # Data Acquisition
@@ -144,6 +146,21 @@ country's parliament. As mentioned above, we gathered resources from
 ten EU member countries. Although every country that we worked with
 offered their minutes in a digital format, each of them was unique and
 downloading them had us face different challenges.
+
+The data sources were as follows:
+
+| Country            | Parliament archive                                                                           |
+|--------------------|----------------------------------------------------------------------------------------------|
+| Austria            | https://www.parlament.gv.at/PAKT/STPROT/                                                     |
+| Belgium            | https://www.senate.be/www/?MIval=/index_senate&MENUID=24400&LANG=fr                          |
+| The Czech Republic | https://public.psp.cz/en/sqw/hp.sqw?k=82                                                     |
+| France             | https://www.assemblee-nationale.fr/14/debats/                                                |
+| Hungary            | https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018                             |
+| Ireland            | https://www.oireachtas.ie/en/debates/find/?datePeriod=all&debateType=dail&resultsPerPage=100 |
+| Italy              | https://www.senato.it/3809?testo_generico=911                                                |
+| The Netherlands    | https://www.eerstekamer.nl/debat_gemist_2                                                    |
+| Poland             | https://biblioteka.sejm.gov.pl/zasob_archiwum_sejmu/                                         |
+| Spain              | https://www.senado.es/web/relacionesciudadanos/datosabiertos/catalogodatos/sesionesplenariascd/index.html?legis=14                                                          |
 
 After inspecting the archives, we could split them into two
 groups. One group offers their protocols (at least for the last couple
@@ -623,7 +640,12 @@ One limitation even with the University's scientific computing resources
 that is relevant for similar projects is that while they are much more scalable
 than the hardware that could be used before, one hard limitation is the per-node
 memory size which can still restrict what can be achieved with large text
-corpora when including n-gram terms.
+corpora when including n-gram terms. While not get a complete result set
+using this configuration within the project processing time, it was at least
+possible to identify the `FitLdaModel` function from the
+`textmineR`[@libtextmineR] package as a bottleneck since it creates a memory
+peak when being finished, while working with considerably lower memory
+requirements throughout the training.
 
 ### Language proficiency
 
@@ -817,6 +839,29 @@ Indeed, Russia shows up predominantly in the cartogram for this topic
 does so because it was mentioned as one country that committed itself to 100
 percent of renewable energy sources by 2021.
 
+### How it can fail completely
+
+![Terms for topic t_100 for Hungary(\#fig:hungaryr100)](../hungary-t_100-relevance.png)
+
+![Cartogram for topic t_100 for Hungary(\#fig:hungaryc100)](../hungary-t_100.png)
+
+Finally, topic 100 from the Hungarian debates can serve as an example on
+how imperfect the approach can work at worst. The cartogram
+(figure \@ref(fig:hungaryc100)) shows some focus on Poland. The terms
+(figure \@ref(fig:hungaryr100)) do so even more when considering that
+"lengyel" can be translated to "Pole". However, when looking at the
+corresponding debate texts, they are not meaningful at all, containing
+mostly session opening and closing. Now, such insignificant topics are
+common with LDA topic modeling[@loulwah2009topic]. When looking at it
+more thoroughly, it does not even surprise. "Lengyel" is also a rather
+common surname in Poland, and the names of many MPs occurring at session
+openings could be considered as background words occurring very often
+from an LDA perspective. Making it worse, while LDA topic modeling
+can cope with multiple meanings of a word to some extent, the simple
+terms-based search to compute country references cannot, and assumes
+a country reference even if the country name collides with any other
+common word in the language corpus.
+
 # Conclusion
 
 The results drawn from this research could already make it obvious where
@@ -947,8 +992,5 @@ Computations for this work were done in part using resources of the
 Leipzig University Computing Centre. Therefore, we are also thankful for
 getting computing access there.
 
-# Remarks
-
 # References
 
-TODO: e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
