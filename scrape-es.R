@@ -1,16 +1,14 @@
 ## -------------------------------------------------------------------
-## Downloading and tidying Spanish parliamentary protocols from 201-
-## 2019
+## Downloading and tidying Spanish parliamentary protocols from 2011-
+## 2021
 ## -------------------------------------------------------------------
 
-library(tidytext)
 library(tidyverse)
 library(hunspell)
 library(pdftools)
 library(jsonlite)
 library(textmineR)
 library(future.apply)
-library(XML)
 plan(multisession)
 source("scrape.R")
 

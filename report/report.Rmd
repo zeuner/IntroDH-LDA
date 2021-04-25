@@ -1,9 +1,12 @@
 ---
 output:
-  pdf_document:
+    bookdown::pdf_document2:
     highlight: tango
+    citation_package: biblatex
     number_sections: true
 documentclass: scrartcl
+bibliography: report.bib
+biblio-style: authoryear
 header-includes:
   - \usepackage{setspace}
   - \onehalfspacing
@@ -18,7 +21,7 @@ fontsize: 12pt
 {\bfseries\huge Analysing Transnational Relationships in Parliament Debates \par}
 \vspace{1cm}
 {\large Agoston Volcz, Jonathan Weinmann, Isidor Zeuner \par
-March 14. 2021}
+April 19. 2021}
 
 \vfill
 Fakultät für Mathematik und Informatik \\
@@ -36,7 +39,8 @@ Semester: WS 2020/2021
 
 Parliaments usually make corrected versions of their plenary minutes
 available for public inspection on the internet. The minutes contain
-the speeches of the MPs, reports and debates. These documents are
+the speeches of the members of the parliament (MPs), reports and debates.
+These documents are
 accessible to everybody, but the large amount of the documents makes
 it difficult to index and search. And it is even more difficult to
 recognise complex topics, connections and "between the lines"
@@ -124,27 +128,39 @@ be. This meant a limitation in flexibility and experimentation in
 designing the models. In order to have more resources, we asked the
 computer science department if they could provide a suitable
 machine. This was not the case and the university computer centre did
-not have enough free space for us to work on their R cluster. One
+not have enough free space for us to work on their R-Studio servers. One
 possibility would have been to implement our modelling as a SLURM
-job. This would have been exciting, but since we had no experience
-with SLURM, the preparation would have been too time-consuming and
-probably beyond the scope of our project. So, we had to deal with this
-technical limitation and adapt the objective accordingly.
+job to run on the URZ big data cluster. This would have been exciting,
+but since we had no experience with SLURM, we decided not to depend on this
+option, and prepare the report so it could be finished without needing
+more computing power. Although we could actually get cluster access in the
+end, the conclusions gained there were more technical in nature (see section
+\@ref(computing-requirements)).
 
 
 # Data Acquisition
 
-# Analysis
-
-The narrowing of the topic raises a few problems that should be addressed here. It must be clarified what is meant by "relevant”. As the research question is deliberately open-ended and invites further questions, it seems impossible to give a universal definition of the term "relevant". Relevance means a situational importance that someone attaches to something in a particular context. In the same way, relevance is always related to the everyday knowledge of the recipient and the importance of individual topics varies accordingly. In the analysis, therefore, one's own bias must always be taken into account as to which topics now seem relevant and important to the individual. When a user searches for topics related to transnational relations, he or she probably has certain expectations regarding the results. Based on these expectations, they can decide whether a topic is relevant to them or not. Therefore, the goal should be to make the analysis as neutral as possible. And accordingly, the tool, the topic model, should be as free of bias as possible.
-
-## Methodology
 According to the original project idea, we needed to gather resources
 from various archives, which are accessible on the websites of each
 country's parliament. As mentioned above, we gathered resources from
 ten EU member countries. Although every country that we worked with
 offered their minutes in a digital format, each of them was unique and
 downloading them had us face different challenges.
+
+The data sources were as follows:
+
+| Country            | Parliament archive                                                                           |
+|--------------------|----------------------------------------------------------------------------------------------|
+| Austria            | https://www.parlament.gv.at/PAKT/STPROT/                                                     |
+| Belgium            | https://www.senate.be/www/?MIval=/index_senate&MENUID=24400&LANG=fr                          |
+| The Czech Republic | https://public.psp.cz/en/sqw/hp.sqw?k=82                                                     |
+| France             | https://www.assemblee-nationale.fr/14/debats/                                                |
+| Hungary            | https://www.parlament.hu/web/guest/orszaggyulesi-naplo-2014-2018                             |
+| Ireland            | https://www.oireachtas.ie/en/debates/find/?datePeriod=all&debateType=dail&resultsPerPage=100 |
+| Italy              | https://www.senato.it/3809?testo_generico=911                                                |
+| The Netherlands    | https://www.eerstekamer.nl/debat_gemist_2                                                    |
+| Poland             | https://biblioteka.sejm.gov.pl/zasob_archiwum_sejmu/                                         |
+| Spain              | https://www.senado.es/web/relacionesciudadanos/datosabiertos/catalogodatos/sesionesplenariascd/index.html?legis=14                                                          |
 
 After inspecting the archives, we could split them into two
 groups. One group offers their protocols (at least for the last couple
@@ -153,7 +169,27 @@ documents. Categorising them into one or the other group helped
 deciding how to approach downloading the data. The PDF documents were
 usually longer than their HTML counterparts, consisting of everything
 that happened in one session, which in most cases corresponds to one
-day. The first country for which we downloaded PDF documents was
+day.
+
+Some countries, for example the Netherlands, offered both HTML-based
+and PDF-based protocols, and not necessarily for the same data. In
+order to be able to work on all the selected countries while still
+taking into account the limited time available for the project, for
+each country only one type of protocols was selected.
+
+## PDF-based data {#pdf-scraping}
+
+The first completely working data acquisition workflow was for PDF-based
+protocols. Because of this, the PDF downloading and processing was also
+the part that set the standard for how many other parts of the project
+should work. After some quick thoughts about possible options, it was
+soon agreed upon to use the R language[@Rcore] for all parts of the
+project since all project participants were to some extent familiar with
+it. Also, the `tidyverse`[@libtidyverse] proved useful here due to
+the functions it provides to conveniently do repetitive tasks on large
+data sets.
+
+The first country for which we downloaded PDF documents was
 Hungary, mainly for two reasons, the first being familiarity with the
 language and the second was the convenience of downloading. As none of
 the archives has a button to download everything, we had to write
@@ -179,8 +215,8 @@ in this regard were Belgium, The Czech Republic, Spain and Italy.
 
 Although there are more documents available for download from Austria,
 documents that were created earlier than what we decided to work with
-were not created using the PDF format, they were mostly scanned documents with
-inconsistent formatting. Including these documents would have been
+were not initially created as PDF files, they were mostly scanned documents
+with inconsistent formatting. Including these documents would have been
 possible by implementing optical character recognition, but the size and
 time-frame of the project did not allow us to explore every possible
 document. It is also worth to mention, that in order to better
@@ -205,7 +241,8 @@ server's side and the fact that we could not implement a solution that
 can handle multiple asynchronous downloads.
 
 The next part was extracting raw text from the documents. For this
-task, we used the pdftools package for R. The pdf_data function that
+task, we used the `pdftools`[@libpdftools] package for R[@Rcore]. The
+`pdf_data` function that
 ships with it is able to extract text from PDF documents word by word,
 while retaining metadata such as x and y coordinates for each word and
 whether each word was at the end of a line. After some initial trial
@@ -255,7 +292,8 @@ program checked each document (e.g. 3rd period, Session no. 30., left
 side) whether it was written in Dutch or French. Although this
 approach was computationally more expensive than sheer guessing,
 because it checked the probability of the possible languages for each
-document by searching for stop words, this method turned out to work
+document by tokenizing it using the `koRpus`[@libkoRpus] package and
+searching for stop words, this method turned out to work
 very accurately. We still ended up not being able to use the first
 period's documents, since the languages were not separated to either
 side, but intermingled as a sentence-by-sentence translation, which in
@@ -265,42 +303,99 @@ only the French part of the text, since in theory it has the same
 content as the Dutch part.
 
 After extracting the text from the PDF documents, we collected the
-resulting text files into one JSON file for each country, which were
+resulting text files into one JSON file for each country using
+the `jsonlite`[@libjsonlite] package, which were
 then used to created the document term matrices.
 
-The challenge with HTML countries was that they did not always have an
-easily understandable URL naming scheme and that the sessions were
-not on one page but scattered through multiple HTML documents. For
-example debates from Poland were scattered through the websites of
-individual politicians, which had to be then concatenated to get full
-debates.
+## HTML-based data
+
+For HTML-based protocols, the raw data contained more semantic structure
+in comparison with the PDF format that focuses mostly on how the content
+is displayed. This led both to opportunities and challenges.
+
+On the one hand, it was often easier to distinguish given debate items
+from the complete parliament meeting protocols. For the Netherlands and
+France, the protocols could be split based on specific HTML elements or
+attributes that always occurred at the beginning of a debate item,
+and only there. For Poland, there was even a single web page for every
+speech, so individual debate items had to be concatenated from multiple
+pages after identifying the debate item for each of the pages.
+
+On the other hand, focusing on the semantic structure without the
+parliaments using a common standard for this, much of the logic had
+to be written individually for each country. In case of Poland,
+there were even two different archive servers that applied a different
+structure to the data, and had to be tackled individually. Furthermore,
+the representation of the debates as multiple speech pages for Poland
+led to a huge amount of individual web pages to be downloaded. Since
+every individual web page to download meant another transaction that
+could eventually fail, basic caching of already fetched web pages was
+implemented so subsequent runs would not need to fetch them again.
+Using the `digest`[@libdigest] library, every URL was assigned a
+cache filename supposed to be unique under reasonable assumptions.
+For the protocols of the Netherlands, there was no hierarchical
+web page structure linking down to each protocol, so the chronologically
+linked pages had to be iterated through. For doing so, linked list logic
+from the `rlist`[@librlist] package proved useful.
+
+After extracting the structure from the raw HTML data and assigning
+the HTML lines to debate items, getting the actual text was usually
+straightforward because it could be achieved by stripping off the
+HTML tags and converting HTML entities to their UTF-8 counterpart
+by use of the `xml2`[@libxml2] package.
+
+As with the PDF based protocols, the resulting data was exported
+to JSON files in order to have a common data format for further
+processing.
+
+## Results
 
 The following table summarizes the amount of data we were able to
 gather for this project.
 
 
-| Country            | No. of legislature periods | Time Range | Word Count          |
-|--------------------|----------------------------|------------|---------------------|
-| Austria            |                          6 | 1999--2019 | 51,722,689          |
-| Belgium            |                          5 | 1999--2019 | 22,356,325 (French) |
-| The Czech Republic |                          3 | 2010--2021 | 29,522,033          |
-| France             |                          ? |          ? | ?                   |
-| Hungary            |                          2 | 2014--2021 | 25,297,392          |
-| Ireland            |                          1 | 2016--2020 | 30,169,798          |
-| Italy              |                          1 | 2013--2018 | 43,483,753          |
-| The Netherlands    |                          ? |          ? | ?                   |
-| Poland             |                          ? |          ? | ?                   |
-| Spain              |                          5 | 2011--2021 | 19,491,066          |
+| Country            | No. of legislature periods | Time Range | Word Count           |
+|--------------------|----------------------------|------------|----------------------|
+| Austria            |                          6 | 1999--2019 |  51,722,689          |
+| Belgium            |                          5 | 1999--2019 |  22,356,325 (French) |
+| The Czech Republic |                          3 | 2010--2021 |  29,522,033          |
+| France             |                          1 | 2012--2021 |  32,155,168          |
+| Hungary            |                          2 | 2014--2021 |  25,297,392          |
+| Ireland            |                          1 | 2016--2020 |  30,169,798          |
+| Italy              |                          1 | 2013--2018 |  43,483,753          |
+| The Netherlands    |                          3 | 2014--2021 |  11,916,017          |
+| Poland             |                          9 | 1991--2021 | 116,433,805          |
+| Spain              |                          5 | 2011--2021 |  19,491,066          |
 
 # Analysis
 
+## Goal
+
+The narrowing of the topic raises a few problems that should be addressed here. It must be clarified what is meant by "relevant”. As the research question is deliberately open-ended and invites further questions, it seems impossible to give a universal definition of the term "relevant". Relevance means a situational importance that someone attaches to something in a particular context. In the same way, relevance is always related to the everyday knowledge of the recipient and the importance of individual topics varies accordingly. In the analysis, therefore, one's own bias must always be taken into account as to which topics now seem relevant and important to the individual. When a user searches for topics related to transnational relations, he or she probably has certain expectations regarding the results. Based on these expectations, they can decide whether a topic is relevant to them or not. Therefore, the goal should be to make the analysis as neutral as possible. And accordingly, the tool, the topic model, should be as free of bias as possible.
+
 ## Method
+
+### Topic modeling
+
+In contrast to the highly diverse situation in the data acquisition step,
+in the analysis part the idea was that the different text corpora should
+be handled as uniformly as possible, with handling differences being mostly
+limited to the different languages. So, the functions were implemented
+to work on all the countries, with all remaining differences being stored
+in a hash table created using the `hash`[@libhash] package. It turned out
+that it was sufficient to differentiate language and country codes and
+the source for the stopword list since some languages were not
+represented in the `SnowballC`[@libSnowballC] package, while others
+were missing in the lists from the `stopwords`[@libstopwords] package.
 
 Our initial approach to the analysis was to first create document term
 matrices from the cleaned up data, then train an LDA topic model on
-it. We first created document term matrices, where stop words
-shipped with the SnowballC package were removed, and lemmas were
-normalized using hunspell. After training the model on these matrices,
+it. We first loaded the text corpora using the `readr`[@libreadr] package and
+created document term matrices, where stop words
+shipped with the `SnowballC`[@libSnowballC] package were removed, and
+lemmas were
+normalized using `hunspell`[@libhunspell]. After training the model
+on these matrices,
 we began to notice multiple problems with this approach. The first
 problem was that nearly all topics had similar top terms. These were
 not stop words in the traditional sense, but nevertheless
@@ -315,7 +410,8 @@ from the data.
 
 During our research, we learnt that lemma stemming can also introduce
 anomalies into the results. As Thomas Köntges pointed out in his
-article[^1], increasing the data volume helps to maintain accuracy
+article[@UBHD-68613810],
+increasing the data volume helps to maintain accuracy
 when removing the lemma stemming step from the analysis. We needed to
 increase the data volume, since most of the languages we worked with
 have a higher morphological complexity than English. We had collected
@@ -325,26 +421,19 @@ in the analysis we decided to include more legislation periods, so we
 went back to the data acquisition part to get more data. Also at this
 time, we decided to cut long documents into shorter parts, which had
 us modify the scraper scripts accordingly. The difficulty with
-Belgium's parliamentary minutes mentioned in point 3 became obvious
-during this step.
+Belgium's parliamentary minutes mentioned in section \@ref(pdf-scraping)
+became obvious during this step.
 
 As for the topic modelling algorithm, we started with 20 topics. Since
 many of the topics were not really topics but rather a collection of
-common words in a parliament, we increased the number of topics. These
-changes led to our problem with computing resources. Running the
-algorithm with the increased data set and increased topic number also
-increased computing time and memory usage. Since the algorithm is not
-parallelised, we could run several country's scripts at the same time,
-because the memory usage also allowed this. After the increase, this
-was not possible any more, even on multiple CPU systems, because
-increased memory usage usually did not allow to do so. This slowed
-down our progress significantly. For countries that had less data,
-running the algorithm took between 8 to 10 hours, for more data,
-it could take 2--3 days. Changing one parameter cost us from several days
-up to one week of computing time, in which we could not further improve
-our approach to analysis. Finally, as we increased the number of
-topics to 100, we stopped changing the parameters given to the
-algorithm and started to work more on the analysis.
+common words in a parliament, we increased the number of topics. This
+led to challenges regarding computational costs as described in
+section \@ref(computing-requirements). Consequently, as we increased
+the number of topics to 100, we stopped changing the parameters
+given to the algorithm and started to work more on the
+analysis.
+
+### Transnational relations {#country-references}
 
 Our first approach was to (manually) search for country names, city
 names or topics that had to do with other countries. All countries had
@@ -368,30 +457,540 @@ trafficking across the Mediterranean.
 This manual searching however, is not reproducible, and it is easy to
 introduce our own biases coming from our knowledge of politics or lack
 thereof into the results. In order to avoid these negative effects, we
-opted for another approach.
+opted for another approach that also allows for pre-filtering nearly
+arbitary amounts of text in preparation for human research to be
+done subsequently.
 
-(Here comes Isidor's latest improvements for the analysis, including
-results and visualizaion.)
+In order to gather references to other countries in a fully automated manner,
+they had to be found by matching the terms extracted from the documents.
+
+Terms to search for could be extracted from the data collected by the
+Wikipedia project. It has encyclopedia pages for every country in nearly
+every language, and it links them together through interlanguage links,
+which allowed for straightforward extraction of the multi-language
+translations from the HTML pages, and of the country names directly
+from the URLs using the `urltools`[@liburltools] package.
+
+For performance reasons, matching the search terms against the document
+terms was done using the document term matrices already computed for
+the topic modeling. Since the search terms might occur as inflected
+forms depending on the language, this step required morphological
+normalization using the Snowball stemmer[@libSnowballC]. With a stemming
+function $s$ and a country name consisting of $k$ words $w_{i}$,
+we count the words $w$ in the document where $s(w) = s(w_{i})$. Then,
+the word from the country name with the minimum matching word count
+is considered the frequency of the country name in the document.
+
+It should be
+mentioned that this approach is of limited accuracy. It can create false
+positives because the document term matrices lack information about the
+positions of the terms in the documents. For example, an English-language
+text might be related to the country "South Africa" if it
+contains the terms "south" and "africa" which
+are both expected to also occur in other contexts. At the same time,
+the German-language translation "Südafrika" should be
+fairly unambiguous. This must be kept in mind when interpreting the results
+since it means that text corpora in different languages cannot be
+meaningfully compared to each other with respect to extracted country
+references. It is expected that this effect can be reduced by working
+with n-grams in the document term matrices. With increasing $n$, this
+is expected to lead to results comparable to a phrase search in a web
+search engine.
+
+At this point, there is the topic modeling result that can be transformed to
+a matrix of document-topic frequencies, and a matrix of document-country
+frequencies. These can be combined to a topic-country matrix using a
+matrix cross-product. Furthermore, the document-topic and document-country
+matrices can be used for retrieval of the documents related to a specific
+cell in the topic-country matrix. To do so, a ranking vector for all documents
+can be computed as the product of the column from the document-topic matrix
+corresponding to the topic, and the column from the document-country matrix
+corresponding to the country.
+
+### Reporting and visualization {#visualization}
+
+For understanding what the different latent topics are about, the
+`LDAvis`[@libLDAvis] package proved very useful since it comes with
+a web-based interactive interface where different parameters can be
+quickly tested for their effect. However, for reporting purposes, it
+seemed preferable to calculate and plot the corresponding term relevance
+measure[@sievert-shirley-2014-ldavis] directly in R. This way, the
+plotted bar graphs would always be exactly reproducible from the data.
+Parametrized with $\lambda = 0,6$, the most relevant terms for each topic
+usually allowed for some interpretation on what it is about.
+
+For visualizing the computed correlations between latent topics and
+country references, working with a world map was envisioned, which
+was available from the `maps`[@libmaps] package. However, this would
+not map to the country reference data out of the box. On the one hand,
+the country names retrieved as described in section
+\@ref(country-references) mostly referred to sovereign states.
+On the other hand, the names in the map data referred to regions,
+which may or may not have outer sovereignty, or may even be subject
+of disputes between different countries. For the purpose of this project
+and under consideration of the limited timeframe, only a rather rough
+mapping could be created, which maps external territories to the
+corresponding countries without taking into account to what extent
+there may be partial outer sovereignty, and where regions with very
+complex or disputed territorial situation were left out. This does
+also mean that an unintended bias could not be avoided at this stage.
+But being careful is mandated anyway when interpreting the resulting
+data, since the text matching of country names does also not guarantee
+that the text actually referred to a sovereign country rather than
+a region with a similar name. To prepare the visualizations which
+were all required to work on the data referring to sovereign countries,
+a spatial polygons data structure was created from the world map using the
+`maptools`[@libmaptools] package and augmented with the region names
+mapped to countries.
+
+In order to get a visual overview over what latent topics show a clear
+correlation to particular countries, plotting pie charts on a world map
+seemed promising. An existing implementation of pie charts for geospatial
+data was available through the `marmap`[@libmarmap] package. It turned
+out that more than 200 countries relating to 100 topics, leading to
+more than 20,000 data points, was just too much information to be visualized
+on one map. In the end, a trade-off had to be implemented here where
+only a subset of the topics were plotted into the pie charts. To choose
+them, a matrix was computed which contained, for each country, the fractions
+of the individual topics when compared to the sum of all topics found in
+connection with that country. Here, a high fraction would mean that a
+topic was much more frequent than the other topics with respect to the
+particular country. So, the maximum over all countries, computed using
+the `Rfast`[@libRfast] package, would be high for a topic if there
+was at least one country where the topic exceeded the other topics
+considerably. By that logic, the top ten topics with respect to the
+maximum fraction were chosen to be visualized since they were
+expected to show most selectiveness with respect to different countries.
+
+For a given topic, its correlation to different countries was visualized
+using a diffusion cartogram. To implement this, the `getcartr`[@libgetcartr]
+package could be used which provides an interface to compute a
+transformed map based on a mapping variable to substitute the land area
+for each spatial polygon. The idea was to have countries show up bigger
+on the map if they are related to the given topic more than on average,
+and to show up smaller if it happens less than on average. This meant that
+the mapping variable could not be proportional to the topic frequency
+itself since this would be, on average, in the same dimension for all
+countries, thereby regularly making all small countries show up bigger
+and all big countries smaller. Instead, in order to achieve a map distortion
+relative to the original country areas, the mapping variable had to be
+multiplied by the factor of the original country area in the mercator
+projection. This could be computed from the spatial polygons using the
+`UScensus2000`[@libUScensus2000] package. This way, someone who is used to
+how the world map looks like in the mercator projection would see where
+the map differs. The downside is that countries which have a very small
+land area are hardly noticeable on the cartogram no matter how focused
+the topic is on them.
+
+Finally, even for writing the project report itself, the project
+infrastructure based on the R language proved useful. Using the
+`rmarkdown`[@librmarkdown] package, the report including embedded
+visualizations could be written mostly in markdown syntax and then
+rendered to a PDF document. This way, the report document could easily
+be updated based on new visualizations created from the data. Later
+it turned out that using the `bookdown`[@libbookdown] package even
+allows for automatically updated in-document references to other sections.
 
 ## Challenges
 
-- enormous computing resource (time, memory)
-- unfamiliarity with the theoretical background of LDA topic modeling, lack of experience
-- languages that none of us speaks
+### Unfamiliarity with LDA topic modeling
+
+The project participants did not have previous practical experiences with LDA
+topic modeling. Also, there was only very limited previous knowledge of the
+theoretical background of LDA topic modeling. This led to a situation where
+a fair part of reasonable practises for processing a project like this
+had to be learned the hard way. Especially when it comes to the inner
+workings of the training algorithm and its characteristics regarding
+computational complexity, a some of the challenges described in the following
+section \@ref(computing-requirements) might have been possibly to handle
+earlier or more effectively if this had not been the case. However,
+disregarding what could have been achieved result-wise with more previous
+knowledge, this could actually be considered as a positive outcome from
+a learners' perspective.
+
+### Computing requirements {#computing-requirements}
+
+In the process of continuously refining the analysis approach, it turned out
+that considerable computing resources are useful for performing this kind
+of analysis. For one text corpus, training an LDA model with 100 topics for
+500 iterations required up to 2,7 GiB of virtual memory when the corpora
+were preprocessed
+using morphological normalization. Without morphological normalization,
+up to 8,0 GiB of virtual memory were required. Furthermore, one text
+corpus required between 8 and 87 hours depending on its size on a
+student laptop, and could not be sped up by parallelization because
+of the iterative nature of the LDA
+algorithm implemented in the `textmineR`[@libtextmineR] package.
+Due to the high memory
+usage, possibilities for parallel processing of multiple text corpora
+were limited on commodity hardware. Consequently, the text corpora
+had to be processed mostly one after another, leading to a long running
+time for getting the results from changed LDA parameters.
+
+It is possible to cope with this challenge by making use of the university's
+scientific computing infrastructure. However, since we became aware of
+the high requirements late throughout
+the limited project handling time, and since it takes time to negotiate
+computing access and to implement the necessary configuration changes,
+we could only make limited use of this possibility. This should be considered
+as a valuable insight for future similar projects, where computing access
+should be negotiated from the beginning.
+
+One limitation even with the University's scientific computing resources
+that is relevant for similar projects is that while they are much more scalable
+than the hardware that could be used before, one hard limitation is the per-node
+memory size which can still restrict what can be achieved with large text
+corpora when including n-gram terms. While not get a complete result set
+using this configuration within the project processing time, it was at least
+possible to identify the `FitLdaModel` function from the
+`textmineR`[@libtextmineR] package as a bottleneck since it creates a memory
+peak when being finished, while working with considerably lower memory
+requirements throughout the training.
+
+### Language proficiency
+
+The project included text corpora in languages that none of the participants
+could speak, and where also passive understanding was limited. On the one hand,
+this showed how effective the algorithmic prefiltering of the huge text corpora
+was, considering that with this level of language proficiency, it would have
+been completely out of reach to even consider looking for transnational
+references with foreign language debates. On the other hand, trying to
+interpret the results made it very clear that it is still hard to extract
+any conclusions without enough understanding of the language. It is often
+possible to look at the relevant terms from a topic and figure out what
+it might be about using a dictionary. But to verify any suspected
+transnational relationship, it is necessary to be able to read an excerpt
+of the raw parliamentary protocols.
 
 ## Results
 
-- excerpts from the results as a table representation of the data frames
-- statistics
-- word clouds
+Not surprisingly, between four and thirty years of parliamentary work
+in ten countries contains more information about transnational relations
+than what could possibly be presented in this report. But we will include
+a selection of what we found during the project.
+
+### "Causa Kasachstan"
+
+As for all countries processed, we could create a pie chart map as described
+in section \@ref(visualization) as seen in figure \@ref(fig:austriapie).
+
+![Pie chart map for Austria(\#fig:austriapie)](../austria-pies.png)
+
+One of the ten topics identified here as being selective to one or a few
+countries is topic number 18, which has relevant terms as seen in figure
+\@ref(fig:austriar18).
+
+![Terms for topic t_18 for Austria(\#fig:austriar18)](../austria-t_18-relevance.png)
+
+Also, the topic cartogram as seen in figure \@ref(fig:austriac18) shows a
+strong focus on the country Kazakhstan.
+
+![Cartogram for topic t_18 for Austria(\#fig:austriac18)](../austria-t_18.png)
+
+Now, terms like "staatsanwaltschaft" (public prosecutor) or "ermittlung"
+(investigation) create the impression of a criminal investigation, which
+is usually a matter of the interior. So, a strong focus on another country
+seemed notable. And indeed, checking the protocol data for the cause
+did show something that could be considered significant. Much of what
+led to the indicators in the figures came from the stenographic protocol
+from the 11th December 2009 of the National Council of the Republic of
+Austria, containing in-depth discussions about the results from an
+investigation committee concerned with a transnational issue labelled
+"Causa Kasachstan" and related extradition demands.
+
+No doubt this is a transnational issue, however it concerns a single
+event that had to be handled, not necessarily a long-term relationship
+between the countries Austria and Kazakhstan.
+
+### Refugee politics
+
+Another topic from Austria's pie chart map, topic 46, shows various terms
+that can be associated with immigration and refugees
+(figure \@ref(fig:austriar46)), like "flüchtling" (refugee), "integration"
+(integration) or "asylverfahren" (asylum procedure).
+
+![Terms for topic t_46 for Austria(\#fig:austriar46)](../austria-t_46-relevance.png)
+
+Looking at the cartogram (figure \@ref(fig:austriac46)), various countries
+can be seen highlighted. It turns out that they got there due to different
+roles they have in the discussions that took place about refugee politics.
+For example, Eritrea and Gambia got mentioned because the MPs actually
+talked about people who immigrated to Austria from these countries.
+On the other hand, Papua New Guinea and Nauru got mentioned as examples
+for countries from which immigration to Australia takes place, thereby
+discussing Australia's refugee and immigration politics and its effects.
+Lesotho got mentioned for comparison reasons, because it was before
+Austria on the donor list of the World Food Programme at the time when
+the debate took place (4th July 2018).
+
+![Cartogram for topic t_46 for Austria(\#fig:austriac46)](../austria-t_46.png)
+
+From these examples, Eritrea and Gambia could be most likely considered
+as transnational relations. Papua New Guinea and Nauru would rather be
+relations of Australia. And it is interesting that Australia did not
+show up so prominently in the visualizations.
+
+### Debt crisis
+
+Another topic we looked at for Austria, although not visible on the
+pie chart map, was topic number 50. In the term relevance chart
+(figure \@ref(fig:austriar50)), the country "griechenland" (Greece) gets
+mentioned quite prominently, right after "bank" (bank). There
+is also "krise" (crisis) and "schulden" (debts). The obvious
+interpretation is that this latent topic covers Europe's debt crisis
+around 2010.
+
+![Terms for topic t_50 for Austria(\#fig:austriar50)](../austria-t_50-relevance.png)
+
+The corresponding cartogram in figure \@ref(fig:austriac50) highlights, among
+other countries, all Eurozone countries that required assistance of third
+parties in order to handle their responsibilities with respect to government
+debts or banks under national supervision within the debt crisis.
+
+![Cartogram for topic t_50 for Austria(\#fig:austriac50)](../austria-t_50.png)
+
+In the related parliamentary protocols, a lot of discussions regarding the
+implications of helping the indebted Eurozone member states can be found.
+
+### Galician sea workers
+
+![Terms for topic t_46 for Spain(\#fig:spainr46)](../spain-t_46-relevance.png)
+
+![Cartogram for topic t_46 for Spain(\#fig:spainc46)](../spain-t_46.png)
+
+One latent topic we looked at in the protocols from Spain was topic number 46.
+The relevant terms as seen in figure \@ref(fig:spainr46) suggest some focus
+on the autonomous community Galicia. Yet the cartogram (figure
+\@ref(fig:spainc46)) highlights Norway. The focus comes mostly from a
+protocol from the 21st February 2017 where the government was urged to
+take measures to protect the rights of Galician sea workers embarked on
+ships from the Kingdom of Norway until 1994.
+
+This topic is interesting because it shows that a transnational relationship,
+in this case sea workers being embarked on ships of another nation,
+can take more than 20 years to show up in the work of the parliament.
+
+### Treaties
+
+![Pie chart map for Poland(\#fig:polandpie)](../poland-pies.png)
+
+A topic found on the pie chart map for poland (figure \@ref(fig:polandpie))
+is topic number 22. According to the relevant terms
+(figure \@ref(fig:polandr22)), this one might be present in discussions
+about treaties due to the high relevance of terms like "ratifikacja"
+(ratification) or "umowa" (treaty).
+
+![Terms for topic t_22 for Poland(\#fig:polandr22)](../poland-t_22-relevance.png)
+
+The cartogram for that topic (figure \@ref(fig:polandc22)), or in case of
+small countries its legend, shows different countries. Since treaties between
+countries are a form of transnational relationship that will have a pretty
+direct impact on parliamentary work in many political systems, it could
+be expected that these will often be contracting parties of Poland. And
+indeed, this is often the case. We found that Grenada and Belize showed
+up because of draft laws for information exchange in tax matters between
+the countries and Poland. For Palau, no one-to-one relationship was the cause
+since the parliamentary protocol was about the International Convention
+on Standards of Training, Certification and Watchkeeping for Fishing
+Vessel Personnel (STCW-F), where Palau was mentioned as having ratified
+the convention in 2011, thereby causing the convention to enter into force
+due to reaching the minimum threshold of signing countries. So, this
+would be a case where the country Palau showing up could be considered
+as coincidental, considering that it does not have a special status when
+compared to the other countries ratifying the convention.
+
+![Cartogram for topic t_22 for Poland(\#fig:polandc22)](../poland-t_22.png)
+
+### Abortion laws
+
+When looking at topic 11 in the debates from Poland, terms (figure
+\@ref(fig:polandr11)) like "ciąża" (pregnancy), "aborcja" (abortion),
+"kobieta" (woman) or "dziecko" (child) make it reasonable to assume that
+it marks debates related to abortion laws. Since these are a controversial
+topic in Poland, it is not surprising that it has made it into a rather
+clear latent topic.
+
+![Terms for topic t_11 for Poland(\#fig:polandr11)](../poland-t_11-relevance.png)
+
+Considering that this is a matter of inner politics, it could be asked
+where the country references as seen in the cartogram (figure
+\@ref(fig:polandc11)) stem from. Looking at the corresponding debates,
+it can be seen that a lot of different countries are mentioned for
+comparison reasons because they have either more liberal or more strict
+policies on abortion than Poland. Sometimes there is also something said
+about the situation in these countries. So, these might not be considered
+transnational relations, but rather indications on how MPs in Poland view
+laws in other countries.
+
+![Cartogram for topic t_11 for Poland(\#fig:polandc11)](../poland-t_11.png)
+
+### Nuclear power {#hungary-nuclear}
+
+![Terms for topic t_22 for Hungary(\#fig:hungaryr22)](../hungary-t_22-relevance.png)
+
+![Cartogram for topic t_22 for Hungary(\#fig:hungaryc22)](../hungary-t_22.png)
+
+Topic 22 in the debates from Hungary show terms (figure \@ref(fig:hungaryr22))
+like "atomenergia" (nuclear energy) or "atomerőmű" (nuclear power plant),
+so the question arises whether this can be related to the manual findings
+about the nuclear power plant in Hungary in section \@ref(country-references).
+Indeed, Russia shows up predominantly in the cartogram for this topic
+(figure \@ref(fig:hungaryc22)). Costa Rica, which also shows up, however
+does so because it was mentioned as one country that committed itself to 100
+percent of renewable energy sources by 2021.
+
+### How it can fail completely
+
+![Terms for topic t_100 for Hungary(\#fig:hungaryr100)](../hungary-t_100-relevance.png)
+
+![Cartogram for topic t_100 for Hungary(\#fig:hungaryc100)](../hungary-t_100.png)
+
+Finally, topic 100 from the Hungarian debates can serve as an example on
+how imperfect the approach can work at worst. The cartogram
+(figure \@ref(fig:hungaryc100)) shows some focus on Poland. The terms
+(figure \@ref(fig:hungaryr100)) do so even more when considering that
+"lengyel" can be translated to "Pole". However, when looking at the
+corresponding debate texts, they are not meaningful at all, containing
+mostly session opening and closing. Now, such insignificant topics are
+common with LDA topic modeling[@loulwah2009topic]. When looking at it
+more thoroughly, it does not even surprise. "Lengyel" is also a rather
+common surname in Poland, and the names of many MPs occurring at session
+openings could be considered as background words occurring very often
+from an LDA perspective. Making it worse, while LDA topic modeling
+can cope with multiple meanings of a word to some extent, the simple
+terms-based search to compute country references cannot, and assumes
+a country reference even if the country name collides with any other
+common word in the language corpus.
 
 # Conclusion
 
-# Remarks
+The results drawn from this research could already make it obvious where
+the limitations of the approach lie. Countries are getting referenced
+in parliamentary debates for various reasons, and it is always necessary
+to re-check the results in order to find out whether they are actually
+caused by transnational relations. However, the approach could lead to
+various insightful findings that might have been hard to find by unguidedly
+reading through the debates. It remains to be shown how the approach compares
+to other ways of finding out about transnational relations, both with respect
+to efficiency and accuracy.
+
+# Future work
+
+## Data completeness
+
+Future work could concentrate on trying to make the available data for each
+country more comprehensive, for example by processing both HTML and PDF
+protocols where they are available. This would require strategies for
+deduplicating the data. It would enable more detailed analyses of specific
+time intervals when it can be ensured that there is data from all the
+countries for the chosen time interval.
+
+## Scalability
+
+The size of the text corpora, while enabling training of the LDA models without
+the need for morphological normalization, also limited what could be achieved
+using the available computing resources. In particular, due to the sequential
+nature of the LDA training algorithm, parallelization was of limited use.
+It could be researched whether algorithms adapted for parallelization,
+like Sparse Partially Collapsed MCMC[@magnusson2017sparse], could improve
+this situation.
+
+Furthermore, there are smaller technical issues that could be looked into
+in order to increase the technological reach of the software. One thing
+we noticed is that the exception handling of the R language does not work
+correctly when being wrapped in calls to `future_lapply` from the
+`future.apply`[@libfuture.apply] package, which is why we had to use
+serial counterparts of that function for code that should be parallelizable.
+Finding solutions for this issue could greatly cut down the time required
+at least for the data acquisition part. Also, it turned out that
+the `saveRDS` function we needed to persistently store results of expensive
+computations like the LDA model training can require considerably higher
+amounts of memory for serializing data structures that fit well into memory
+for a long time before the serialization takes place. If this situation could
+be improved, larger LDA models could be trained within existing memory
+constraints.
+
+## Rethinking visualizations
+
+It could be argued that while there may be topics that are geographic by
+their nature, thereby making maps or cartograms a fitting visualization,
+this is not really insightful for topics that do not have a connection to
+the countries' geography at all. For example, for the tax-related treaties
+of a country, issues like the possibly nested interdependence of companies
+across national borders is of greater importance than the size or location
+of the involved countries.
+
+An interesting option for future efforts may be network-style visualizations,
+although this might require more data cleanup or coverage of more
+countries' parliaments.
+
+On the other hand, also further researching the full potential of the
+geospatial visualization strategy might prove interesting. Sometimes,
+these are insightful and probably hard to beat by other types of visualization.
+On Hungary's nuclear power topic (section \@ref(hungary-nuclear)), the
+whole African continent is shown conspicuously small. There are other
+situations where such visualizations might lead to interesting insights.
+For example, with very local matters, it could be expected that neighbouring
+countries look very big on a cartogram. This might be the case for
+COVID-19-related measures since they are often related to border situations,
+but we did not have sufficiently new data for all countries at this point.
+Another example might be maritime topics, for which it could be investigated
+whether they make countries with sea access look big more often.
+
+## Model training boundaries
+
+For this project, every parliament was processed as one training set for LDA
+modeling, and the resulting model was also only used on the texts from the
+same parliament. This provided for an artifical boundary between the models,
+with the effect of topics from different parliaments not being comparable
+to each other. Also, there is the natural boundary of languages, which
+was in addition responsible for country references not being comparable
+between parliaments.
+
+Other ways of approaching the research might be
+interesting, though. Models could also be created only for particular
+time intervals, possibly sharpening the lens for events from that time
+interval. On the other hand, models could be created based on the
+text collections from multiple parliaments using the same language,
+allowing an analysis on how country-topic correlations differ between
+two parliaments.
+
+On the other hand, multilingual text collections like that from Belgium
+might demand for tools which can do better than just excluding all but one
+language. Researching such possibilities might also lead to approaches that
+allow for comparative research of different parliaments using different
+languages.
+
+## Refining models
+
+Some anomalies in the country references might be possible to reduce
+by further researching good measures for their relevance to a topic.
+Also, the topic models themselves might become sharper by going
+beyond the bag-of-words model and including n-grams[@Wallach05topicmodeling].
+This could not be achieved throughout the project because the time
+after getting scientific computing access did not suffice to compute
+all models including bigrams.
+
+## Other state entities
+
+Depending on what kind of transnational relations are of interest, there
+might be better places to look than parliamentary debates. After all, in
+the fictional case where the existing legislation already works perfectly
+for a given kind of transnational relation, there might not be the need
+for any member of the legislation to ever look at it, even less debate it.
+But it would be possible that these show up in archives of certain ministries
+in the corresponding countries. If these are also openly accessible, similar
+methods might be applied.
+
+# Acknowledgements
+
+We are thankful to Dr. Thomas Köntges who did not only provide us a great
+introduction to available methods before project start, but also with valuable
+pointers for handling the challenges we encountered throughout the project.
+
+Computations for this work were done in part using resources of the
+Leipzig University Computing Centre. Therefore, we are also thankful for
+getting computing access there.
 
 # References
 
-e.g. websites of various parliaments, research papers we read on the topic, libraries we used for the analysis etc.
-
-[^1]: Thomas Köntges: *Measusing Philosophy in the First Thousand Years
-of Greek Literature*. In Digital Classics Online, 2020. P. 1--23.

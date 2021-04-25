@@ -1,16 +1,14 @@
 ## -------------------------------------------------------------------
-## Downloading and tidying Spanish parliamentary protocols from 201-
+## Downloading and tidying Irish parliamentary protocols from 2016-
 ## 2019
 ## -------------------------------------------------------------------
 
-library(tidytext)
 library(tidyverse)
 library(hunspell)
 library(pdftools)
 library(jsonlite)
 library(textmineR)
 library(future.apply)
-library(XML)
 plan(multisession)
 source("scrape.R")
 

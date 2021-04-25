@@ -3,7 +3,6 @@
 ## 2018
 ## -------------------------------------------------------------------
 
-library(tidytext)
 library(tidyverse)
 library(hunspell)
 library(pdftools)
